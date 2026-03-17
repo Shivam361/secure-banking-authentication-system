@@ -129,10 +129,10 @@ _(Add screenshots here later)_
 ## Documentation
 
 - UML Diagrams (Use Case, Sequence, ERD)
-- System Design
-- Security Analysis
-- Fraud Detection Model
-
+- [System Design](documentation/system-design.md)
+- [Security Model](documentation/security-model.md)
+- [Code Architecture](documentation/code-architecture.md)
+- [Engineering Decisions](documentation/engineering-decisions.md)
 ---
 
 ## Future Improvements
