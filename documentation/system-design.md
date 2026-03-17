@@ -1,12 +1,12 @@
-# 🏗️ System Design
+# System Design
 
-## 📌 Overview
+## Overview
 
 The Secure Banking Authentication System is designed using a modular, service-based architecture to ensure maintainability, scalability, and separation of concerns. The system simulates a real-world banking authentication workflow with integrated fraud detection.
 
 ---
 
-## 🧱 Architecture Style
+## Architecture Style
 
 The system follows a **layered architecture** inspired by MVC principles:
 
@@ -28,7 +28,7 @@ The system follows a **layered architecture** inspired by MVC principles:
 
 ---
 
-## 🔑 Core Components
+## Core Components
 
 ### 1. AuthService
 Responsible for:
@@ -58,7 +58,7 @@ Handles:
 
 ---
 
-## 🔄 Authentication Flow
+## Authentication Flow
 
 1. User enters username and password
 2. `AuthService` verifies credentials
@@ -98,13 +98,13 @@ Handles:
 
 ### SOLID Principles
 
-- **Single Responsibility**  
+- **Single Responsibility**
   Each service has a clear role (Auth vs Fraud)
 
-- **Open/Closed Principle**  
+- **Open/Closed Principle**
   System can be extended (e.g., adding ML fraud detection)
 
-- **Dependency Injection**  
+- **Dependency Injection**
   Services are injected using .NET DI container
 
 ---
