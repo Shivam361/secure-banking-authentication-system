@@ -10,7 +10,7 @@ With the rise of digital banking, protecting user accounts from unauthorized acc
 
 ---
 
-## Features
+## Features/Key Highlights
 
 -  User Registration & Login
 -  Multi-Factor Authentication (OTP-based)
@@ -21,6 +21,30 @@ With the rise of digital banking, protecting user accounts from unauthorized acc
 -  Fraud Alerts Logging
 -  Admin Monitoring Capabilities
 -  Clean Architecture using SOLID principles
+
+---
+
+## How It Works
+
+1. User logs in using username and password
+2. System verifies credentials via AuthService
+3. OTP is generated and required for verification (MFA)
+4. System retrieves user location via IP
+5. FraudDetectionService compares login location with home location
+6. Suspicious activity is logged as a fraud event
+7. User gains access only after successful OTP verification
+
+---
+
+## Threat Model
+
+| Threat                    | Mitigation                  |
+|---------------------------|-----------------------------|
+| Brute force attack        | Login attempt tracking      |
+| Credential theft          | Multi-Factor Authentication |
+| Session hijacking         | Controlled session flow     |
+| Fraudulent login location | Location-based detection    |
+| Suspicious transactions   | Rule-based fraud detection  |
 
 ---
 
