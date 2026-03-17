@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SecureBankingApp.Pages.OtpPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="OTP Verification"
+    BackgroundColor="Black">
+
+    <ContentPage.Resources>
+        <Color x:Key="ErrorColor">#E74C3C</Color>
+        <Color x:Key="NormalBorder">#DDDDDD</Color>
+        <Color x:Key="NormalBg">White</Color>
+        <Color x:Key="ErrorBg">#FFF6F6</Color>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <VerticalStackLayout
+        Padding="40"
+        Spacing="25"
+        VerticalOptions="Center"
+        HorizontalOptions="Center">
+
+            <!-- Grid to layer Frame and Shimmer -->
+            <Grid WidthRequest="300" HeightRequest="80">
+
+                <!-- Card container for the Entry -->
+                <Frame
+            x:Name="OtpFrame"
+            CornerRadius="5"
+            Padding="0"
+            BackgroundColor="{StaticResource NormalBg}"
+            BorderColor="{StaticResource NormalBorder}"
+            HasShadow="False">
+
+                    <!-- Visual states for normal/error -->
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="BorderColor" Value="{StaticResource NormalBorder}" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource NormalBg}" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Error">
+                                <VisualState.Setters>
+                                    <Setter Property="BorderColor" Value="{StaticResource ErrorColor}" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource ErrorBg}" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+
+                    <!-- The actual OTP Entry -->
+                    <Entry
+              x:Name="OtpEntry"
+              Placeholder="Enter code"
+              Keyboard="Numeric"
+              FontSize="20"
+              TextColor="Black"
+              PlaceholderColor="#888"
+              HorizontalOptions="FillAndExpand"
+              Margin="12,8" />
+                </Frame>
+
+                <!-- Shimmer overlay -->
+                <BoxView
+            x:Name="Shimmer"
+            CornerRadius="5"
+            BackgroundColor="#EEEEEE"
+            Opacity="0.35"
+            IsVisible="False" />
+            </Grid>
+
+            <!-- Verify button -->
+            <Button
+          x:Name="VerifyButton"
+          Text="{Binding VerifyButtonText}"
+          Clicked="OnVerifyClicked"
+          IsEnabled="{Binding IsNotBusy}"
+          CornerRadius="5"
+          BackgroundColor="#512BD4"
+          TextColor="White"
+          Padding="12" />
+
+            <!-- Busy indicator -->
+            <ActivityIndicator
+          IsVisible="{Binding IsBusy}"
+          IsRunning="{Binding IsBusy}"
+          HorizontalOptions="Center" />
+
+            <!-- Error message -->
+            <Label
+          x:Name="OtpErrorLabel"
+          FontSize="14"
+          TextColor="{StaticResource ErrorColor}"
+          HorizontalTextAlignment="Center"
+          LineBreakMode="WordWrap" />
+        </VerticalStackLayout>
+    </ContentPage.Content>
+</ContentPage>

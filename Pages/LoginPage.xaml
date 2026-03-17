@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SecureBankingApp.Pages.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Secure Banking"
+    BackgroundColor="Black">
+
+    <ContentPage.Content>
+        <VerticalStackLayout
+        Padding="40"
+        Spacing="30"
+        VerticalOptions="Center"
+        HorizontalOptions="Center">
+
+            <!-- App Logo or Icon -->
+            <Image
+          Source="dotnet_bot.png"
+          HeightRequest="80"
+          WidthRequest="80"
+          HorizontalOptions="Center" />
+
+            <!-- Page Header -->
+            <Label
+          Text="Welcome Back"
+          FontSize="28"
+          FontAttributes="Bold"
+          HorizontalOptions="Center" />
+
+            <!-- Card Container -->
+            <Frame
+          Padding="20"
+          CornerRadius="10"
+          HasShadow="True"
+          BackgroundColor="#F0F0F0"
+          WidthRequest="300">
+
+                <VerticalStackLayout Spacing="20">
+
+                    <Entry
+              x:Name="UsernameEntry"
+              Placeholder="Username"
+              TextColor="Black"
+              PlaceholderColor="#888"
+              FontSize="16" />
+
+                    <Entry
+              x:Name="PasswordEntry"
+              Placeholder="Password"
+              IsPassword="True"
+              TextColor="Black"
+              PlaceholderColor="#888"
+              FontSize="16" />
+
+                    <Button
+              x:Name="LoginButton"
+              Text="{Binding LoginButtonText}"
+              Clicked="OnLoginClicked"
+              IsEnabled="{Binding IsNotBusy}"
+              CornerRadius="5"
+              Padding="10" />
+                    <Button
+                 Text="Create New Account"
+                 Clicked="OnRegisterButtonClicked"
+                 BackgroundColor="#888"
+                TextColor="White"
+                CornerRadius="5"
+                Margin="0,12" />
+
+
+                    <ActivityIndicator
+              IsVisible="{Binding IsBusy}"
+              IsRunning="{Binding IsBusy}"
+              HorizontalOptions="Center" />
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Error Message -->
+            <Label
+          x:Name="ErrorLabel"
+          TextColor="Red"
+          FontSize="14"
+          HorizontalOptions="Center"
+          LineBreakMode="WordWrap" />
+
+        </VerticalStackLayout>
+    </ContentPage.Content>
+</ContentPage>

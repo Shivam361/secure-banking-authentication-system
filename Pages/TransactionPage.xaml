@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SecureBankingApp.Pages.TransactionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="New Transfer"
+    BackgroundColor="Black">
+
+    <VerticalStackLayout Padding="30" Spacing="18">
+
+        <Label Text="Transfer Funds" FontSize="24" FontAttributes="Bold" />
+
+        <Entry x:Name="ToUserEntry" Placeholder="Recipient Username" TextColor="White" PlaceholderColor="Gray" />
+        <Entry x:Name="AmountEntry" Placeholder="Amount (e.g. 250.00)" Keyboard="Numeric" TextColor="White" PlaceholderColor="Gray" />
+        <Entry x:Name="LocationEntry" Placeholder="Location (e.g. London)" Keyboard="Text" TextColor="White" PlaceholderColor="Gray" />
+
+        <Button
+        x:Name="SubmitButton"
+        Text="{Binding SubmitButtonText}"
+        Clicked="OnSubmitClicked"
+        IsEnabled="{Binding IsNotBusy}"
+        CornerRadius="5"
+        BackgroundColor="#512BD4"
+        TextColor="White"
+        Padding="12" />
+
+        <ActivityIndicator IsVisible="{Binding IsBusy}"
+                       IsRunning="{Binding IsBusy}"
+                       HorizontalOptions="Center" />
+
+        <Label x:Name="TxErrorLabel"
+           TextColor="Red"
+           FontSize="14"
+           LineBreakMode="WordWrap" />
+
+        <Label x:Name="TxSuccessLabel"
+           TextColor="Green"
+           FontSize="14"
+           LineBreakMode="WordWrap" />
+
+    </VerticalStackLayout>
+</ContentPage>

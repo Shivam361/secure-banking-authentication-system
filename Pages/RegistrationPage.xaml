@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SecureBankingApp.Pages.RegistrationPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Register"
+    BackgroundColor="Black">
+
+    <VerticalStackLayout Padding="30" Spacing="14">
+
+        <Label Text="Create Account" FontSize="24" FontAttributes="Bold" />
+
+        <Entry x:Name="UsernameEntry" Placeholder="Username" />
+        <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
+        <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" />
+        <Entry x:Name="ConfirmPasswordEntry" Placeholder="Confirm Password" IsPassword="True" />
+
+        <Button
+            x:Name="RegisterButton"
+            Text="Register"
+            TextColor="White"
+            Clicked="OnRegisterClicked"
+            BackgroundColor="#512BD4"
+            CornerRadius="6" />
+
+        <Label x:Name="RegErrorLabel" TextColor="Red" FontSize="14" />
+        <Label x:Name="RegSuccessLabel" TextColor="Green" FontSize="14" />
+
+    </VerticalStackLayout>
+</ContentPage>

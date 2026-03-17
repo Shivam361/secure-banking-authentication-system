@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SecureBankingApp.Pages.TransactionHistoryPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Transaction History"
+    BackgroundColor="Black">
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+        <Label Text="Your Transactions" FontSize="24" FontAttributes="Bold" />
+
+        <CollectionView x:Name="TransactionList" ItemsSource="{Binding Transactions}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="10" Margin="0,6" HasShadow="True">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Timestamp, StringFormat='{0:dd MMM yyyy HH:mm}'}"
+                     FontSize="14" TextColor="#888" />
+                            <Label Text="{Binding Amount, StringFormat='Amount: {0:C}'}"
+                     FontSize="16" FontAttributes="Bold" />
+                            <Label Text="{Binding Location, StringFormat='Location: {0}'}"
+                     FontSize="14" />
+                            <Label Text="{Binding FromUsername, StringFormat='From: {0}'}" FontSize="14"/>
+                            <Label Text="{Binding ToUsername, StringFormat='To: {0}'}" FontSize="14"/>
+                            <Label Text="{Binding Amount, StringFormat='Amount: {0:C}'}" FontSize="16"/>
+
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>
