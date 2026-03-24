@@ -48,23 +48,29 @@ namespace SecureBankingApp.Services
 
         // Generate and store a 6-digit OTP valid for 2 minutes
         public string GenerateOtp(string username)
-        {
-            var bytes = new byte[4];
-            _rng.GetBytes(bytes);
-            var code = (BitConverter.ToUInt32(bytes, 0) % 900000 + 100000).ToString();
-            var now = DateTime.UtcNow;
+{
+    var now = DateTime.UtcNow;
 
-            var req = new OTPRequest
-            {
-                Username = username,
-                Code = code,
-                ExpiresAt = now.AddMinutes(2)
-            };
-            _db.OTPRequests.Add(req);
-            _db.SaveChanges();
+    //  Remove old OTPs for this user
+    var oldOtps = _db.OTPRequests.Where(r => r.Username == username);
+    _db.OTPRequests.RemoveRange(oldOtps);
 
-            return code;
-        }
+    var bytes = new byte[4];
+    _rng.GetBytes(bytes);
+    var code = (BitConverter.ToUInt32(bytes, 0) % 900000 + 100000).ToString();
+
+    var req = new OTPRequest
+    {
+        Username = username,
+        Code = code,
+        ExpiresAt = now.AddMinutes(2)
+    };
+
+    _db.OTPRequests.Add(req);
+    _db.SaveChanges();
+
+    return code;
+}
 
         // Validate OTP and consume it
         public bool ValidateOtp(string username, string code)
@@ -74,6 +80,12 @@ namespace SecureBankingApp.Services
                 .Where(r => r.Username == username && r.Code == code && r.ExpiresAt >= now)
                 .OrderByDescending(r => r.ExpiresAt)
                 .FirstOrDefault();
+
+                // 🔥 Cleanup expired OTPs
+var expired = _db.OTPRequests.Where(r => r.ExpiresAt < now);
+_db.OTPRequests.RemoveRange(expired);
+_db.SaveChanges();
+
             if (req == null) return false;
 
             _db.OTPRequests.Remove(req);
