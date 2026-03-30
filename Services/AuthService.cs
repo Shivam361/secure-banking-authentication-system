@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,29 +15,36 @@ namespace SecureBankingApp.Services
         private readonly AppDbContext _db;
         private readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
 
+        // BCrypt work factor — 2^11 iterations; increase to 12+ as hardware improves
+        private const int WorkFactor = 11;
+
         public AuthService(AppDbContext db)
         {
             _db = db;
         }
 
-        // Hash a plaintext password
+        /// <summary>
+        /// Hash a plaintext password using BCrypt with an auto-generated salt.
+        /// Returns a 60-character BCrypt hash string (includes algorithm, cost, salt, and hash).
+        /// </summary>
         public string HashPassword(string plain)
         {
-            using var sha = SHA256.Create();
-            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(plain));
-            return Convert.ToHexString(bytes);
+            return BCrypt.Net.BCrypt.HashPassword(plain, workFactor: WorkFactor);
         }
+
         public string? CurrentUsername { get; private set; }
 
-        // Verify login credentials
+        /// <summary>
+        /// Verify login credentials using BCrypt's timing-safe comparison.
+        /// </summary>
         public bool VerifyPassword(string username, string plain, out User? user)
         {
             user = _db.Users.SingleOrDefault(u => u.Username == username);
             if (user == null)
                 return false;
 
-            // compute whether the hash matches
-            bool ok = user.PasswordHash == HashPassword(plain);
+            // BCrypt.Verify handles salt extraction and timing-safe comparison
+            bool ok = BCrypt.Net.BCrypt.Verify(plain, user.PasswordHash);
 
             // if valid, remember who just logged in
             if (ok)

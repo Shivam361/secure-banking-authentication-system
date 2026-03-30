@@ -6,9 +6,9 @@ This document outlines planned improvements for the Secure Banking Authenticatio
 
 ## Phase 1 — Critical Security Fixes
 
-### 1.1 Replace SHA-256 with a Proper Password Hashing Algorithm
-- **Current:** Passwords are hashed using raw `SHA256`, which is a fast general-purpose hash — easily brute-forced at billions of attempts per second on modern GPUs.
-- **Planned:** Migrate to `BCrypt`, `Argon2`, or `PBKDF2` (`Rfc2898DeriveBytes` in .NET) with sufficient work factors and per-user salts.
+### ~~1.1 Replace SHA-256 with a Proper Password Hashing Algorithm~~ ✅ COMPLETED
+- **Previous:** Passwords were hashed using raw `SHA256`, which is a fast general-purpose hash — easily brute-forced at billions of attempts per second on modern GPUs.
+- **Implemented:** Migrated to `BCrypt` (`BCrypt.Net-Next` v4.0.3) with a work factor of 11 and automatic per-password salts. `VerifyPassword` now uses BCrypt's timing-safe comparison.
 - **Impact:** Eliminates the most critical security vulnerability in the system.
 
 ### 1.2 Implement Real OTP Delivery
