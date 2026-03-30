@@ -11,9 +11,9 @@ This document outlines planned improvements for the Secure Banking Authenticatio
 - **Implemented:** Migrated to `BCrypt` (`BCrypt.Net-Next` v4.0.3) with a work factor of 11 and automatic per-password salts. `VerifyPassword` now uses BCrypt's timing-safe comparison.
 - **Impact:** Eliminates the most critical security vulnerability in the system.
 
-### 1.2 Implement Real OTP Delivery
-- **Current:** The OTP code is displayed directly in a `DisplayAlert` dialog after login, defeating the purpose of multi-factor authentication.
-- **Planned:** Send OTP via email (or SMS) using a mock or real delivery service. Display only a confirmation message: *"An OTP has been sent to your registered email."*
+### ~~1.2 Implement Real OTP Delivery~~ ✅ COMPLETED
+- **Previous:** The OTP code was displayed directly in a `DisplayAlert` dialog after login, defeating the purpose of multi-factor authentication.
+- **Implemented:** OTP is now sent via email using MailKit SMTP (Gmail). When SMTP isn't configured, falls back to a `DisplayAlert` marked as "(Dev Mode)". Added a "Resend Code" button with 30-second cooldown. Email addresses are masked in confirmation messages (e.g., `sh***@gmail.com`).
 - **Impact:** Ensures MFA functions as a true second factor.
 
 ### 1.3 Enforce HTTPS for External API Calls

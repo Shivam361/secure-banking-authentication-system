@@ -1,4 +1,4 @@
-﻿// MauiProgram.cs
+// MauiProgram.cs
 using System;
 using System.IO;
 using Microsoft.Maui;
@@ -35,6 +35,7 @@ namespace SecureBankingApp
                 options.UseSqlite($"Data Source={dbPath}"));
 
             // --- Register application services ---
+            builder.Services.AddSingleton<IEmailService, EmailService>();
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<FraudDetectionService>();
 

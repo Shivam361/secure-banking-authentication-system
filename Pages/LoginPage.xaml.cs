@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using SecureBankingApp.Database;
 using SecureBankingApp.Models;
@@ -138,17 +138,48 @@ namespace SecureBankingApp.Pages
 
             // --- End location check ---
 
-            // Generate OTP (this happens for ALL successful logins)
-            var code = _auth.GenerateOtp(username);
+            // Generate OTP and send via email
+            var (emailSent, otpCode) = await _auth.GenerateAndSendOtpAsync(username, user.Email);
 
             await Task.Delay(250);
-            await DisplayAlert("OTP", $"Your code is: {code}", "OK");
+
+            if (emailSent)
+            {
+                // Email delivered — show confirmation without revealing the code
+                var maskedEmail = MaskEmail(user.Email);
+                await DisplayAlert("OTP Sent",
+                    $"A verification code has been sent to {maskedEmail}.\nIt expires in 2 minutes.",
+                    "OK");
+            }
+            else
+            {
+                // SMTP not configured — fallback to DisplayAlert for development convenience
+                await DisplayAlert("OTP (Dev Mode)",
+                    $"Email delivery unavailable.\nYour code is: {otpCode}",
+                    "OK");
+            }
+
             IsBusy = false;
 
             // Navigate to OTP page
             await Navigation.PushAsync(
                 MauiProgram.ServiceProvider.GetRequiredService<OtpPage>()
             );
+        }
+        /// <summary>
+        /// Masks an email address for display: "shivam@gmail.com" → "sh***@gmail.com"
+        /// </summary>
+        private static string MaskEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email) || !email.Contains('@'))
+                return "your registered email";
+
+            var parts = email.Split('@');
+            var local = parts[0];
+            var domain = parts[1];
+
+            var visible = local.Length >= 2 ? local[..2] : local[..1];
+            return $"{visible}***@{domain}";
         }
 
     }

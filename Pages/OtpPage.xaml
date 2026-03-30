@@ -11,6 +11,7 @@
         <Color x:Key="NormalBorder">#DDDDDD</Color>
         <Color x:Key="NormalBg">White</Color>
         <Color x:Key="ErrorBg">#FFF6F6</Color>
+        <Color x:Key="SuccessColor">#27AE60</Color>
     </ContentPage.Resources>
 
     <ContentPage.Content>
@@ -19,6 +20,14 @@
         Spacing="25"
         VerticalOptions="Center"
         HorizontalOptions="Center">
+
+            <!-- Info label -->
+            <Label
+              Text="Enter the 6-digit code sent to your email"
+              FontSize="16"
+              TextColor="#CCCCCC"
+              HorizontalTextAlignment="Center"
+              LineBreakMode="WordWrap" />
 
             <!-- Grid to layer Frame and Shimmer -->
             <Grid WidthRequest="300" HeightRequest="80">
@@ -82,13 +91,34 @@
           TextColor="White"
           Padding="12" />
 
+            <!-- Resend Code button -->
+            <Button
+          x:Name="ResendButton"
+          Text="Resend Code"
+          Clicked="OnResendClicked"
+          IsEnabled="{Binding CanResend}"
+          CornerRadius="5"
+          BackgroundColor="Transparent"
+          BorderColor="#512BD4"
+          BorderWidth="1"
+          TextColor="#512BD4"
+          Padding="8"
+          FontSize="14" />
+
+            <!-- Resend cooldown label -->
+            <Label
+          x:Name="ResendCooldownLabel"
+          FontSize="12"
+          TextColor="#888888"
+          HorizontalTextAlignment="Center" />
+
             <!-- Busy indicator -->
             <ActivityIndicator
           IsVisible="{Binding IsBusy}"
           IsRunning="{Binding IsBusy}"
           HorizontalOptions="Center" />
 
-            <!-- Error message -->
+            <!-- Error / Status message -->
             <Label
           x:Name="OtpErrorLabel"
           FontSize="14"

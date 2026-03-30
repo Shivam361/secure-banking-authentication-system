@@ -1,8 +1,10 @@
-﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using SecureBankingApp.Database;
 using SecureBankingApp.Services;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SecureBankingApp.Pages
@@ -11,6 +13,7 @@ namespace SecureBankingApp.Pages
     {
         readonly AuthService _auth;
         readonly string _username;
+        readonly string _userEmail;
 
         bool _isBusy;
         public new bool IsBusy
@@ -28,16 +31,32 @@ namespace SecureBankingApp.Pages
             }
         }
 
+        bool _canResend = true;
+        public bool CanResend
+        {
+            get => _canResend;
+            set
+            {
+                if (_canResend == value) return;
+                _canResend = value;
+                OnPropertyChanged(nameof(CanResend));
+            }
+        }
+
         public bool IsNotBusy => !IsBusy;
         public string VerifyButtonText => IsBusy ? "Verifying…" : "Verify Code";
 
-        public OtpPage(AuthService auth)
+        public OtpPage(AuthService auth, AppDbContext db)
         {
             InitializeComponent();
             BindingContext = this;
 
             _auth = MauiProgram.ServiceProvider.GetRequiredService<AuthService>();
             _username = auth.CurrentUsername!;
+
+            // Look up the user's email for resend
+            var user = db.Users.SingleOrDefault(u => u.Username == _username);
+            _userEmail = user?.Email ?? "";
         }
 
         async void OnVerifyClicked(object sender, EventArgs e)
@@ -66,10 +85,54 @@ namespace SecureBankingApp.Pages
             }
 
             // 6) Success → navigate
-            var dashboard = MauiProgram.ServiceProvider.GetRequiredService<MainPage>();
             await Navigation.PushAsync(
-  MauiProgram.ServiceProvider.GetRequiredService<MainPage>()
-);
+                MauiProgram.ServiceProvider.GetRequiredService<MainPage>()
+            );
+        }
+
+        async void OnResendClicked(object sender, EventArgs e)
+        {
+            if (!CanResend || string.IsNullOrEmpty(_userEmail)) return;
+
+            CanResend = false;
+            OtpErrorLabel.Text = "";
+            ResendCooldownLabel.TextColor = Colors.Gray;
+
+            // Generate and send a new OTP
+            var (emailSent, otpCode) = await _auth.GenerateAndSendOtpAsync(_username, _userEmail);
+
+            if (emailSent)
+            {
+                ResendCooldownLabel.TextColor = Color.FromArgb("#27AE60");
+                ResendCooldownLabel.Text = "✓ New code sent to your email.";
+            }
+            else
+            {
+                // Fallback: show OTP in alert for development convenience
+                await DisplayAlert("OTP (Dev Mode)",
+                    $"Email delivery unavailable.\nYour new code is: {otpCode}",
+                    "OK");
+                ResendCooldownLabel.Text = "Code displayed (dev mode).";
+            }
+
+            // Start 30-second cooldown
+            await StartResendCooldownAsync();
+        }
+
+        /// <summary>
+        /// 30-second cooldown timer before allowing another resend.
+        /// </summary>
+        private async Task StartResendCooldownAsync()
+        {
+            for (int remaining = 30; remaining > 0; remaining--)
+            {
+                ResendCooldownLabel.Text = $"Resend available in {remaining}s";
+                ResendCooldownLabel.TextColor = Colors.Gray;
+                await Task.Delay(1000);
+            }
+
+            ResendCooldownLabel.Text = "";
+            CanResend = true;
         }
 
 
