@@ -9,10 +9,10 @@ namespace SecureBankingApp.Pages
 {
     public partial class AdminTransactionListPage : ContentPage
     {
-        private readonly RoleGuardService _guard;
+        private readonly IRoleGuardService _guard;
         public ObservableCollection<Transaction> Transactions { get; set; }
 
-        public AdminTransactionListPage(AppDbContext db, RoleGuardService guard)
+        public AdminTransactionListPage(AppDbContext db, IRoleGuardService guard)
         {
             InitializeComponent();
             _guard = guard;

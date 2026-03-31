@@ -10,8 +10,8 @@ namespace SecureBankingApp.Pages
     {
 
         readonly AppDbContext _db;
-        readonly AuthService _auth;
-        readonly RoleGuardService _guard;
+        readonly IAuthService _auth;
+        readonly IRoleGuardService _guard;
         readonly IServiceProvider _services;
 
         protected override void OnAppearing()
@@ -28,7 +28,7 @@ namespace SecureBankingApp.Pages
             AdminTxButton.IsVisible = _guard.IsAdmin;
         }
 
-        public MainPage(AppDbContext db, AuthService auth, RoleGuardService guard, IServiceProvider services)
+        public MainPage(AppDbContext db, IAuthService auth, IRoleGuardService guard, IServiceProvider services)
         {
             InitializeComponent();
             _db = db;

@@ -11,7 +11,7 @@ namespace SecureBankingApp.Pages
 {
     public partial class TransactionPage : ContentPage, INotifyPropertyChanged
     {
-        readonly FraudDetectionService _fraud;
+        readonly IFraudDetectionService _fraud;
         readonly AppDbContext _db;
         readonly string _username;
 
@@ -31,7 +31,7 @@ namespace SecureBankingApp.Pages
         public bool IsNotBusy => !IsBusy;
         public string SubmitButtonText => IsBusy ? "Processing…" : "Submit";
 
-        public TransactionPage(AppDbContext db, FraudDetectionService fraud, AuthService auth)
+        public TransactionPage(AppDbContext db, IFraudDetectionService fraud, IAuthService auth)
         {
             InitializeComponent();
             BindingContext = this;

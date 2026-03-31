@@ -12,9 +12,9 @@ namespace SecureBankingApp.Pages
     public partial class RegistrationPage : ContentPage
     {
         private readonly AppDbContext _db;
-        private readonly AuthService _auth;
+        private readonly IAuthService _auth;
 
-        public RegistrationPage(AppDbContext db, AuthService auth)
+        public RegistrationPage(AppDbContext db, IAuthService auth)
         {
             InitializeComponent();
             _db = db;

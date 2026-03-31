@@ -11,7 +11,7 @@ namespace SecureBankingApp.Pages
 {
     public partial class OtpPage : ContentPage, INotifyPropertyChanged
     {
-        readonly AuthService _auth;
+        readonly IAuthService _auth;
         readonly IServiceProvider _services;
         readonly string _username;
         readonly string _userEmail;
@@ -47,7 +47,7 @@ namespace SecureBankingApp.Pages
         public bool IsNotBusy => !IsBusy;
         public string VerifyButtonText => IsBusy ? "Verifying…" : "Verify Code";
 
-        public OtpPage(AuthService auth, AppDbContext db, IServiceProvider services)
+        public OtpPage(IAuthService auth, AppDbContext db, IServiceProvider services)
         {
             InitializeComponent();
             BindingContext = this;

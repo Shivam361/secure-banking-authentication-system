@@ -10,7 +10,7 @@ namespace SecureBankingApp.Pages
     public partial class FraudLogPage : ContentPage
     {
         public ObservableCollection<FraudLog> Logs { get; set; }
-        public FraudLogPage(AppDbContext db, AuthService auth, RoleGuardService guard)
+        public FraudLogPage(AppDbContext db, IAuthService auth, IRoleGuardService guard)
         {
             InitializeComponent();
             var user = db.Users.Single(u => u.Username == auth.CurrentUsername);

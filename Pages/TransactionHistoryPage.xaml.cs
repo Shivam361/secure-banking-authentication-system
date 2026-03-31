@@ -11,7 +11,7 @@ namespace SecureBankingApp.Pages
     {
         public ObservableCollection<Transaction> Transactions { get; set; }
 
-        public TransactionHistoryPage(AppDbContext db, AuthService auth)
+        public TransactionHistoryPage(AppDbContext db, IAuthService auth)
         {
             InitializeComponent();
             string username = auth.CurrentUsername!;

@@ -12,8 +12,8 @@ namespace SecureBankingApp.Pages
 {
     public partial class LoginPage : ContentPage, INotifyPropertyChanged
     {
-        readonly AuthService _auth;
-        readonly FraudDetectionService _fraud;
+        readonly IAuthService _auth;
+        readonly IFraudDetectionService _fraud;
         readonly IServiceProvider _services;
 
         bool _isBusy;
@@ -33,7 +33,7 @@ namespace SecureBankingApp.Pages
         public bool IsNotBusy => !IsBusy;
         public string LoginButtonText => IsBusy ? "Processing…" : "Login";
 
-        public LoginPage(AuthService auth, FraudDetectionService fraud, IServiceProvider services)
+        public LoginPage(IAuthService auth, IFraudDetectionService fraud, IServiceProvider services)
         {
             InitializeComponent();
             BindingContext = this;
