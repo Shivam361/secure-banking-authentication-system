@@ -10,6 +10,7 @@ using Microsoft.Maui.Storage;
 using SecureBankingApp.Database;
 using SecureBankingApp.Pages;
 using SecureBankingApp.Services;
+using SecureBankingApp.Models;
 
 namespace SecureBankingApp
 {
@@ -38,6 +39,7 @@ namespace SecureBankingApp
             builder.Services.AddSingleton<IEmailService, EmailService>();
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddSingleton<FraudDetectionService>();
+            builder.Services.AddSingleton<RoleGuardService>();
 
             // --- Register pages for DI navigation ---
             builder.Services.AddTransient<LoginPage>();
@@ -70,16 +72,16 @@ namespace SecureBankingApp
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 var auth = scope.ServiceProvider.GetRequiredService<AuthService>();
 
-                if (!db.Users.Any(u => u.IsAdmin))
+                if (!db.Users.Any(u => u.Role == UserRole.Admin))
                 {
                     db.Users.Add(new SecureBankingApp.Models.User
                     {
-                        Username  = Configuration.SeedConfig.AdminUsername,
+                        Username     = Configuration.SeedConfig.AdminUsername,
                         PasswordHash = auth.HashPassword(Configuration.SeedConfig.AdminPassword),
-                        Email     = Configuration.SeedConfig.AdminEmail,
-                        Balance   = Configuration.SeedConfig.AdminInitialBalance,
-                        IsAdmin   = true,
-                        LastLoginIP = null
+                        Email        = Configuration.SeedConfig.AdminEmail,
+                        Balance      = Configuration.SeedConfig.AdminInitialBalance,
+                        Role         = UserRole.Admin,
+                        LastLoginIP  = null
                     });
                     db.SaveChanges();
                 }

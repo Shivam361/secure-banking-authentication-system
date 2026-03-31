@@ -11,6 +11,8 @@ namespace SecureBankingApp.Pages
 
         readonly AppDbContext _db;
         readonly AuthService _auth;
+        readonly RoleGuardService _guard;
+
         protected override void OnAppearing()
         {
             base.OnAppearing();
@@ -20,25 +22,21 @@ namespace SecureBankingApp.Pages
             var userLogs = _db.FraudLogs.Where(f => f.Description.Contains(user.Username)).ToList();
             FraudBadge.Text = userLogs.Count.ToString();
             FraudBadge.IsVisible = userLogs.Count > 0;
-            // Show admin controls based on role property
-            AdminUserButton.IsVisible = user.IsAdmin;
-            AdminTxButton.IsVisible = user.IsAdmin;
+            // Show admin controls based on role
+            AdminUserButton.IsVisible = _guard.IsAdmin;
+            AdminTxButton.IsVisible = _guard.IsAdmin;
         }
 
-        public MainPage(AppDbContext db, AuthService auth)
+        public MainPage(AppDbContext db, AuthService auth, RoleGuardService guard)
         {
             InitializeComponent();
             _db = db;
             _auth = auth;
+            _guard = guard;
 
-            var username = auth.CurrentUsername!;
-            var currentUser = db.Users.SingleOrDefault(u => u.Username == username);
-
-            if (currentUser?.IsAdmin == true)
-            {
-                AdminUserButton.IsVisible = true;
-                AdminTxButton.IsVisible = true;
-            }
+            // Show admin controls on initial load
+            AdminUserButton.IsVisible = guard.IsAdmin;
+            AdminTxButton.IsVisible = guard.IsAdmin;
 
             UsersCountLabel.Text = db.Users.Count().ToString();
 
