@@ -14,15 +14,17 @@ namespace SecureBankingApp.Services
     {
         private readonly AppDbContext _db;
         private readonly IEmailService _emailService;
+        private readonly SessionService _session;
         private readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
 
         // BCrypt work factor — 2^11 iterations; increase to 12+ as hardware improves
         private const int WorkFactor = 11;
 
-        public AuthService(AppDbContext db, IEmailService emailService)
+        public AuthService(AppDbContext db, IEmailService emailService, SessionService session)
         {
             _db = db;
             _emailService = emailService;
+            _session = session;
         }
 
         /// <summary>
@@ -34,7 +36,8 @@ namespace SecureBankingApp.Services
             return BCrypt.Net.BCrypt.HashPassword(plain, workFactor: WorkFactor);
         }
 
-        public string? CurrentUsername { get; private set; }
+        /// <summary>Read-through to SessionService for backward compatibility.</summary>
+        public string? CurrentUsername => _session.CurrentUsername;
 
         /// <summary>
         /// Verify login credentials using BCrypt's timing-safe comparison.
@@ -48,9 +51,9 @@ namespace SecureBankingApp.Services
             // BCrypt.Verify handles salt extraction and timing-safe comparison
             bool ok = BCrypt.Net.BCrypt.Verify(plain, user.PasswordHash);
 
-            // if valid, remember who just logged in
+            // if valid, record in session
             if (ok)
-                CurrentUsername = username;
+                _session.SetCurrentUser(username);
 
             return ok;
         }

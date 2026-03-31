@@ -36,10 +36,14 @@ namespace SecureBankingApp
                 options.UseSqlite($"Data Source={dbPath}"));
 
             // --- Register application services ---
+            // Singleton: no database dependency — safe to live for the app's lifetime
+            builder.Services.AddSingleton<SessionService>();
             builder.Services.AddSingleton<IEmailService, EmailService>();
-            builder.Services.AddSingleton<AuthService>();
-            builder.Services.AddSingleton<FraudDetectionService>();
-            builder.Services.AddSingleton<RoleGuardService>();
+
+            // Scoped: these depend on AppDbContext (also Scoped) — lifetimes must match
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<FraudDetectionService>();
+            builder.Services.AddScoped<RoleGuardService>();
 
             // --- Register pages for DI navigation ---
             builder.Services.AddTransient<LoginPage>();

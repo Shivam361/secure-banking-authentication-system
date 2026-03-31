@@ -11,12 +11,12 @@ namespace SecureBankingApp.Services
     public class RoleGuardService
     {
         private readonly AppDbContext _db;
-        private readonly AuthService _auth;
+        private readonly SessionService _session;
 
-        public RoleGuardService(AppDbContext db, AuthService auth)
+        public RoleGuardService(AppDbContext db, SessionService session)
         {
             _db = db;
-            _auth = auth;
+            _session = session;
         }
 
         /// <summary>
@@ -24,10 +24,10 @@ namespace SecureBankingApp.Services
         /// </summary>
         public User? GetCurrentUser()
         {
-            if (string.IsNullOrEmpty(_auth.CurrentUsername))
+            if (string.IsNullOrEmpty(_session.CurrentUsername))
                 return null;
 
-            return _db.Users.SingleOrDefault(u => u.Username == _auth.CurrentUsername);
+            return _db.Users.SingleOrDefault(u => u.Username == _session.CurrentUsername);
         }
 
         /// <summary>
