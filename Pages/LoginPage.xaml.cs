@@ -42,21 +42,6 @@ namespace SecureBankingApp.Pages
             _fraud = MauiProgram.ServiceProvider.GetRequiredService<FraudDetectionService>();
         }
 
-        // --- Network helpers ---
-        private async Task<string> GetPublicIpAsync()
-        {
-            using var http = new HttpClient();
-            return await http.GetStringAsync("https://api.ipify.org");
-        }
-        private async Task<string> GetGeoLocationAsync(string ip)
-        {
-            using var http = new HttpClient();
-            var json = await http.GetStringAsync($"http://ip-api.com/json/{ip}");
-            var doc = System.Text.Json.JsonDocument.Parse(json);
-            var city = doc.RootElement.GetProperty("city").GetString();
-            var country = doc.RootElement.GetProperty("country").GetString();
-            return $"{city}, {country}";
-        }
         private async void OnRegisterButtonClicked(object sender, EventArgs e)
         {
             var regPage = MauiProgram.ServiceProvider.GetRequiredService<RegistrationPage>();
@@ -116,8 +101,8 @@ namespace SecureBankingApp.Pages
             string loginLocation = "Unknown";
             try
             {
-                var ip = await GetPublicIpAsync();
-                loginLocation = await GetGeoLocationAsync(ip);
+                var ip = await NetworkHelper.GetPublicIpAsync();
+                loginLocation = await NetworkHelper.GetGeoLocationAsync(ip);
             }
             catch
             {
