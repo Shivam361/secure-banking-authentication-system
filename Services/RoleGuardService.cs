@@ -8,12 +8,12 @@ namespace SecureBankingApp.Services
     /// Pages call this to verify the current user has the required role
     /// before displaying restricted content or performing privileged operations.
     /// </summary>
-    public class RoleGuardService
+    public class RoleGuardService : IRoleGuardService
     {
         private readonly AppDbContext _db;
-        private readonly SessionService _session;
+        private readonly ISessionService _session;
 
-        public RoleGuardService(AppDbContext db, SessionService session)
+        public RoleGuardService(AppDbContext db, ISessionService session)
         {
             _db = db;
             _session = session;

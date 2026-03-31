@@ -5,7 +5,7 @@ namespace SecureBankingApp.Services
     /// Registered as Singleton because it must survive across page navigations
     /// and scoped service lifetimes. Contains NO database dependency.
     /// </summary>
-    public class SessionService
+    public class SessionService : ISessionService
     {
         /// <summary>The username of the currently authenticated user, or null if not logged in.</summary>
         public string? CurrentUsername { get; private set; }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SecureBankingApp.Services
 {
-    public class FraudDetectionService
+    public class FraudDetectionService : IFraudDetectionService
     {
         private readonly AppDbContext _db;
 

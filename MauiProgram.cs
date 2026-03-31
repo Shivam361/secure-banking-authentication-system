@@ -37,30 +37,24 @@ namespace SecureBankingApp
 
             // --- Register application services ---
             // Singleton: no database dependency — safe to live for the app's lifetime
-            builder.Services.AddSingleton<SessionService>();
+            builder.Services.AddSingleton<ISessionService, SessionService>();
             builder.Services.AddSingleton<IEmailService, EmailService>();
 
             // Scoped: these depend on AppDbContext (also Scoped) — lifetimes must match
-            builder.Services.AddScoped<AuthService>();
-            builder.Services.AddScoped<FraudDetectionService>();
-            builder.Services.AddScoped<RoleGuardService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IFraudDetectionService, FraudDetectionService>();
+            builder.Services.AddScoped<IRoleGuardService, RoleGuardService>();
 
             // --- Register pages for DI navigation ---
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<OtpPage>();
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<RegistrationPage>();
-            // in MauiProgram.CreateMauiApp(), after other pages:
             builder.Services.AddTransient<TransactionPage>();
             builder.Services.AddTransient<TransactionHistoryPage>();
             builder.Services.AddTransient<FraudLogPage>();
             builder.Services.AddTransient<AdminUserListPage>();
             builder.Services.AddTransient<AdminTransactionListPage>();
-
-
-
-
-
 
 #if DEBUG
             builder.Logging.AddDebug();
@@ -74,7 +68,7 @@ namespace SecureBankingApp
             using (var scope = ServiceProvider.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var auth = scope.ServiceProvider.GetRequiredService<AuthService>();
+                var auth = scope.ServiceProvider.GetRequiredService<IAuthService>();
 
                 if (!db.Users.Any(u => u.Role == UserRole.Admin))
                 {

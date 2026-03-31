@@ -10,17 +10,17 @@ using System.Security.Cryptography;
 
 namespace SecureBankingApp.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly AppDbContext _db;
         private readonly IEmailService _emailService;
-        private readonly SessionService _session;
+        private readonly ISessionService _session;
         private readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
 
         // BCrypt work factor — 2^11 iterations; increase to 12+ as hardware improves
         private const int WorkFactor = 11;
 
-        public AuthService(AppDbContext db, IEmailService emailService, SessionService session)
+        public AuthService(AppDbContext db, IEmailService emailService, ISessionService session)
         {
             _db = db;
             _emailService = emailService;
