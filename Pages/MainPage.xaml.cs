@@ -1,11 +1,8 @@
-﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls;
 using SecureBankingApp.Database;
 using SecureBankingApp.Models;
-using System.Linq;
-
-using Microsoft.Maui.Controls;
-using System.Linq;
 using SecureBankingApp.Services;
+using System.Linq;
 
 namespace SecureBankingApp.Pages
 {
@@ -23,10 +20,9 @@ namespace SecureBankingApp.Pages
             var userLogs = _db.FraudLogs.Where(f => f.Description.Contains(user.Username)).ToList();
             FraudBadge.Text = userLogs.Count.ToString();
             FraudBadge.IsVisible = userLogs.Count > 0;
-            // Show admin controls only for admin
-            bool isAdmin = user.Username == "admin";
-            AdminUserButton.IsVisible = isAdmin;
-            AdminTxButton.IsVisible = isAdmin;
+            // Show admin controls based on role property
+            AdminUserButton.IsVisible = user.IsAdmin;
+            AdminTxButton.IsVisible = user.IsAdmin;
         }
 
         public MainPage(AppDbContext db, AuthService auth)
@@ -36,23 +32,9 @@ namespace SecureBankingApp.Pages
             _auth = auth;
 
             var username = auth.CurrentUsername!;
+            var currentUser = db.Users.SingleOrDefault(u => u.Username == username);
 
-            // Seed default admin if none
-            if (!db.Users.Any())
-            {
-                // Hash the real password (“adminpass” here) before storing:
-                var realHash = auth.HashPassword("adminpass");
-                db.Users.Add(new Models.User
-                {
-                    Username = "admin",
-                    PasswordHash = realHash,
-                    Email = "admin@bank.com",
-                    Balance = 1000000, // Seed with a large balance for admin
-                    LastLoginIP = null
-                });
-                db.SaveChanges();
-            }
-            if (_auth.CurrentUsername == "admin")
+            if (currentUser?.IsAdmin == true)
             {
                 AdminUserButton.IsVisible = true;
                 AdminTxButton.IsVisible = true;

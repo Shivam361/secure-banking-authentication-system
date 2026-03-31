@@ -14,8 +14,8 @@ namespace SecureBankingApp.Pages
         {
             InitializeComponent();
             var user = db.Users.Single(u => u.Username == auth.CurrentUsername);
-            // For admin, show all logs; for user, filter their username:
-            if (user.Username == "admin") // or use a role property for real admin!
+            // For admin, show all logs; for regular users, filter to their own:
+            if (user.IsAdmin)
                 Logs = new ObservableCollection<FraudLog>(db.FraudLogs.OrderByDescending(f => f.Timestamp).ToList());
             else
                 Logs = new ObservableCollection<FraudLog>(db.FraudLogs

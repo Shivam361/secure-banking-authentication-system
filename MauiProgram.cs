@@ -64,19 +64,21 @@ namespace SecureBankingApp
             var app = builder.Build();
             ServiceProvider = app.Services;
 
-            // ─── SEED DEFAULT USER ──────────────────────────────────────────────────────────────
+            // ─── SEED DEFAULT ADMIN (credentials from env vars / SeedConfig) ─────────────────────
             using (var scope = ServiceProvider.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 var auth = scope.ServiceProvider.GetRequiredService<AuthService>();
 
-                if (!db.Users.Any())
+                if (!db.Users.Any(u => u.IsAdmin))
                 {
                     db.Users.Add(new SecureBankingApp.Models.User
                     {
-                        Username = "admin",
-                        PasswordHash = auth.HashPassword("adminpass"),  // ← real hashed pw
-                        Email = "admin@bank.com",
+                        Username  = Configuration.SeedConfig.AdminUsername,
+                        PasswordHash = auth.HashPassword(Configuration.SeedConfig.AdminPassword),
+                        Email     = Configuration.SeedConfig.AdminEmail,
+                        Balance   = Configuration.SeedConfig.AdminInitialBalance,
+                        IsAdmin   = true,
                         LastLoginIP = null
                     });
                     db.SaveChanges();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,7 @@ namespace SecureBankingApp.Models
         public string? LastLoginIP { get; set; }
         public string? HomeLocation { get; set; } //for geo fraud
         public decimal Balance { get; set; } = 0.0m;
+        public bool IsAdmin { get; set; } = false;
         public int FailedLoginCount { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; } // When the account becomes available again
 
