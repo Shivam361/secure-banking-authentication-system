@@ -99,16 +99,7 @@ namespace SecureBankingApp.Pages
             }
 
             // --- Check login location against home location ---
-            string loginLocation = "Unknown";
-            try
-            {
-                var ip = await NetworkHelper.GetPublicIpAsync();
-                loginLocation = await NetworkHelper.GetGeoLocationAsync(ip);
-            }
-            catch
-            {
-                loginLocation = "Unknown";
-            }
+            string loginLocation = await NetworkHelper.GetCurrentLocationAsync();
 
             var normalizedHome = (user.HomeLocation ?? "").Trim().ToLowerInvariant();
             var normalizedLogin = (loginLocation ?? "").Trim().ToLowerInvariant();

@@ -22,5 +22,22 @@ public static class NetworkHelper
         var country = doc.RootElement.GetProperty("country_name").GetString();
         return $"{city}, {country}";
     }
+
+    /// <summary>
+    /// Orchestrates both IP and Geolocation lookups. 
+    /// Returns "City, Country" or "Unknown" on failure.
+    /// </summary>
+    public static async Task<string> GetCurrentLocationAsync()
+    {
+        try
+        {
+            var ip = await GetPublicIpAsync();
+            return await GetGeoLocationAsync(ip);
+        }
+        catch
+        {
+            return "Unknown";
+        }
+    }
 }
 

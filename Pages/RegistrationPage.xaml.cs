@@ -49,17 +49,7 @@ namespace SecureBankingApp.Pages
                 RegErrorLabel.Text = "Passwords do not match.";
                 return;
             }
-            string homeLocation = "Unknown";
-            try
-            {
-                var ip = await NetworkHelper.GetPublicIpAsync(); // Get the public IP
-                homeLocation = await NetworkHelper.GetGeoLocationAsync(ip);// Optionally: call a geolocation API here to turn IP into a city/country string
-                homeLocation = ip; // or your lookup result, e.g., "London, UK"
-            }
-            catch
-            {
-                // fallback to Unknown or mock
-            }
+            string homeLocation = await NetworkHelper.GetCurrentLocationAsync();
 
 
             // Add user
