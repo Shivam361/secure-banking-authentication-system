@@ -3,87 +3,92 @@
     x:Class="SecureBankingApp.Pages.LoginPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     Title="Secure Banking"
-    BackgroundColor="Black">
+    BackgroundColor="Transparent">
 
-    <ContentPage.Content>
+    <!-- Premium Background Gradient -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#020617" Offset="0.1" />
+            <GradientStop Color="#0F172A" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <ScrollView>
         <VerticalStackLayout
-        Padding="40"
-        Spacing="30"
-        VerticalOptions="Center"
-        HorizontalOptions="Center">
+            Padding="40"
+            Spacing="40"
+            VerticalOptions="Center">
 
-            <!-- App Logo or Icon -->
-            <Image
-          Source="dotnet_bot.png"
-          HeightRequest="80"
-          WidthRequest="80"
-          HorizontalOptions="Center" />
+            <!-- Premium App Branding -->
+            <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                <Frame CornerRadius="20" 
+                       HeightRequest="80" 
+                       WidthRequest="80" 
+                       Padding="0"
+                       BackgroundColor="{StaticResource GlassBackground}"
+                       BorderColor="{StaticResource GlassBorder}">
+                    <Label Text="S" 
+                           FontSize="40" 
+                           FontAttributes="Bold" 
+                           TextColor="{StaticResource AccentGold}"
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center" />
+                </Frame>
+                <Label Text="SECURE BANK" 
+                       Style="{StaticResource Headline}" 
+                       FontSize="24"/>
+                <Label Text="Institutional Grade Security" 
+                       Style="{StaticResource SubHeadline}" 
+                       FontSize="14"/>
+            </VerticalStackLayout>
 
-            <!-- Page Header -->
-            <Label
-          Text="Welcome Back"
-          FontSize="28"
-          FontAttributes="Bold"
-          HorizontalOptions="Center" />
+            <!-- Login Card -->
+            <Frame Style="{StaticResource GlassCard}" 
+                   WidthRequest="350">
+                
+                <VerticalStackLayout Spacing="24">
+                    
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Username" TextColor="{StaticResource Gray300}" FontSize="12" Margin="4,0"/>
+                        <Entry x:Name="UsernameEntry" 
+                               Placeholder="Enter your username" />
+                    </VerticalStackLayout>
 
-            <!-- Card Container -->
-            <Frame
-          Padding="20"
-          CornerRadius="10"
-          HasShadow="True"
-          BackgroundColor="#F0F0F0"
-          WidthRequest="300">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Password" TextColor="{StaticResource Gray300}" FontSize="12" Margin="4,0"/>
+                        <Entry x:Name="PasswordEntry" 
+                               Placeholder="••••••••" 
+                               IsPassword="True" />
+                    </VerticalStackLayout>
 
-                <VerticalStackLayout Spacing="20">
+                    <Button x:Name="LoginButton" 
+                            Text="{Binding LoginButtonText}" 
+                            Style="{StaticResource AccentButton}"
+                            Clicked="OnLoginClicked"
+                            IsEnabled="{Binding IsNotBusy}" />
 
-                    <Entry
-              x:Name="UsernameEntry"
-              Placeholder="Username"
-              TextColor="Black"
-              PlaceholderColor="#888"
-              FontSize="16" />
+                    <Button Text="Create New Account" 
+                            Style="{StaticResource GlassButton}"
+                            Clicked="OnRegisterButtonClicked" />
 
-                    <Entry
-              x:Name="PasswordEntry"
-              Placeholder="Password"
-              IsPassword="True"
-              TextColor="Black"
-              PlaceholderColor="#888"
-              FontSize="16" />
-
-                    <Button
-              x:Name="LoginButton"
-              Text="{Binding LoginButtonText}"
-              Clicked="OnLoginClicked"
-              IsEnabled="{Binding IsNotBusy}"
-              CornerRadius="5"
-              Padding="10" />
-                    <Button
-                 Text="Create New Account"
-                 Clicked="OnRegisterButtonClicked"
-                 BackgroundColor="#888"
-                TextColor="White"
-                CornerRadius="5"
-                Margin="0,12" />
-
-
-                    <ActivityIndicator
-              IsVisible="{Binding IsBusy}"
-              IsRunning="{Binding IsBusy}"
-              HorizontalOptions="Center" />
+                    <ActivityIndicator IsVisible="{Binding IsBusy}" 
+                                       IsRunning="{Binding IsBusy}" 
+                                       Color="{StaticResource AccentGold}"
+                                       HorizontalOptions="Center" />
 
                 </VerticalStackLayout>
             </Frame>
 
             <!-- Error Message -->
-            <Label
-          x:Name="ErrorLabel"
-          TextColor="Red"
-          FontSize="14"
-          HorizontalOptions="Center"
-          LineBreakMode="WordWrap" />
+            <Label x:Name="ErrorLabel" 
+                   TextColor="{StaticResource StatusError}" 
+                   FontSize="14" 
+                   HorizontalOptions="Center" 
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="WordWrap" />
 
         </VerticalStackLayout>
-    </ContentPage.Content>
+    </ScrollView>
 </ContentPage>

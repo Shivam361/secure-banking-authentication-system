@@ -1,6 +1,7 @@
 // MauiProgram.cs
 using System;
 using System.IO;
+using CommunityToolkit.Maui;
 using Microsoft.Maui;
 using Microsoft.Maui.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,7 @@ namespace SecureBankingApp
             // --- App setup ---
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

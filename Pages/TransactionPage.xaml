@@ -3,40 +3,62 @@
     x:Class="SecureBankingApp.Pages.TransactionPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="New Transfer"
-    BackgroundColor="Black">
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="Funds Transfer"
+    BackgroundColor="{StaticResource OffBlack}">
 
-    <VerticalStackLayout Padding="30" Spacing="18">
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="30" VerticalOptions="Center">
 
-        <Label Text="Transfer Funds" FontSize="24" FontAttributes="Bold" />
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Global Transfer" Style="{StaticResource Headline}" HorizontalOptions="Start" />
+                <Label Text="Secure, instantaneous settlement." Style="{StaticResource SubHeadline}" HorizontalOptions="Start" />
+            </VerticalStackLayout>
 
-        <Entry x:Name="ToUserEntry" Placeholder="Recipient Username" TextColor="White" PlaceholderColor="Gray" />
-        <Entry x:Name="AmountEntry" Placeholder="Amount (e.g. 250.00)" Keyboard="Numeric" TextColor="White" PlaceholderColor="Gray" />
-        <Entry x:Name="LocationEntry" Placeholder="Location (e.g. London)" Keyboard="Text" TextColor="White" PlaceholderColor="Gray" />
+            <Frame Style="{StaticResource GlassCard}">
+                <VerticalStackLayout Spacing="20">
 
-        <Button
-        x:Name="SubmitButton"
-        Text="{Binding SubmitButtonText}"
-        Clicked="OnSubmitClicked"
-        IsEnabled="{Binding IsNotBusy}"
-        CornerRadius="5"
-        BackgroundColor="#512BD4"
-        TextColor="White"
-        Padding="12" />
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="RECIPIENT" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
+                        <Entry x:Name="ToUserEntry" Placeholder="Username" />
+                    </VerticalStackLayout>
 
-        <ActivityIndicator IsVisible="{Binding IsBusy}"
-                       IsRunning="{Binding IsBusy}"
-                       HorizontalOptions="Center" />
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="AMOUNT (USD)" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
+                        <Entry x:Name="AmountEntry" Placeholder="0.00" Keyboard="Numeric" />
+                    </VerticalStackLayout>
 
-        <Label x:Name="TxErrorLabel"
-           TextColor="Red"
-           FontSize="14"
-           LineBreakMode="WordWrap" />
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="ORIGIN LOCATION" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
+                        <Entry x:Name="LocationEntry" Placeholder="Current City" Keyboard="Text" />
+                    </VerticalStackLayout>
 
-        <Label x:Name="TxSuccessLabel"
-           TextColor="Green"
-           FontSize="14"
-           LineBreakMode="WordWrap" />
+                    <Button x:Name="SubmitButton"
+                            Text="CONFIRM SETTLEMENT"
+                            Style="{StaticResource AccentButton}"
+                            Clicked="OnSubmitClicked"
+                            IsEnabled="{Binding IsNotBusy}" />
 
-    </VerticalStackLayout>
+                    <ActivityIndicator IsVisible="{Binding IsBusy}"
+                                       IsRunning="{Binding IsBusy}"
+                                       Color="{StaticResource AccentGold}"
+                                       HorizontalOptions="Center" />
+
+                    <Label x:Name="TxErrorLabel"
+                           TextColor="{StaticResource StatusError}"
+                           FontSize="13"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+
+                    <Label x:Name="TxSuccessLabel"
+                           TextColor="{StaticResource StatusSuccess}"
+                           FontSize="13"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

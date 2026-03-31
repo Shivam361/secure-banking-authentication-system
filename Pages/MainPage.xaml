@@ -1,69 +1,140 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     x:Class="SecureBankingApp.Pages.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Dashboard">
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="Institutional Dashboard"
+    BackgroundColor="{StaticResource OffBlack}">
 
-    <VerticalStackLayout Padding="30" Spacing="20">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="24">
 
-        <Label Text="Welcome to your secure dashboard!" FontSize="18" />
-        <Label Text="Total users:" />
-        <Label x:Name="UsersCountLabel" FontAttributes="Bold" FontSize="24" />
-        <!-- inside your MainPage layout, e.g. below users count -->
-        <Button
-    Text="New Transaction"
-    Clicked="OnNewTransactionClicked"
-    CornerRadius="5"
-    BackgroundColor="#512BD4"
-    TextColor="White" />
-        <Button
-    Text="View Transaction History"
-    Clicked="OnViewTransactionsClicked"
-    CornerRadius="5"
-    BackgroundColor="#512BD4"
-    TextColor="White"
-    Margin="0,8" />
-        <Label x:Name="BalanceLabel"
-       FontSize="22"
-       TextColor="#1D6D24"
-       FontAttributes="Bold"
-       Margin="0,0,0,20"/>
-        <Button
-    x:Name="FraudLogButton"
-    Text="Fraud Alerts"
-    Clicked="OnFraudLogClicked"
-    FontSize="18"
-    BackgroundColor="#D43B3B"
-    TextColor="White"
-    Margin="0,10,0,0"/>
-        <Label x:Name="FraudBadge"
-       FontSize="14"
-       TextColor="White"
-       BackgroundColor="#E74C3C"
-       IsVisible="False"
-       HorizontalOptions="End"
-       VerticalOptions="Start"
-       Padding="6,1"
-       Margin="0,-35,15,0"/>
-        <Button
-    x:Name="AdminUserButton"
-    Text="View All Users"
-    IsVisible="False"
-    Clicked="OnAdminUserClicked"
-    BackgroundColor="#0D47A1"
-    TextColor="White"
-    Margin="0,10,0,0"/>
-        <Button
-    x:Name="AdminTxButton"
-    Text="View All Transactions"
-    IsVisible="False"
-    Clicked="OnAdminTxClicked"
-    BackgroundColor="#0097A7"
-    TextColor="White"
-    Margin="0,10,0,20"/>
+            <!-- Header Section -->
+            <Grid ColumnDefinitions="*, Auto">
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="Welcome back," 
+                           TextColor="{StaticResource Gray400}" 
+                           FontSize="14" />
+                    <Label Text="Secure Account" 
+                           FontSize="24" 
+                           FontAttributes="Bold" />
+                </VerticalStackLayout>
+                
+                <!-- Notification / User Icon placeholder -->
+                <Frame Grid.Column="1" 
+                       WidthRequest="50" 
+                       HeightRequest="50" 
+                       CornerRadius="25" 
+                       Padding="0" 
+                       BackgroundColor="{StaticResource Gray800}" 
+                       BorderColor="{StaticResource GlassBorder}">
+                    <Label Text="JS" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center" 
+                           TextColor="{StaticResource AccentGold}" 
+                           FontAttributes="Bold" />
+                </Frame>
+            </Grid>
 
+            <!-- Wealth Card -->
+            <Frame Style="{StaticResource PremiumCard}" 
+                   Padding="0" 
+                   HasShadow="True">
+                <Grid RowDefinitions="Auto, Auto" Padding="24">
+                    <VerticalStackLayout Grid.Row="0" Spacing="8">
+                        <Label Text="TOTAL BALANCE" 
+                               TextColor="{StaticResource Gray400}" 
+                               FontSize="12" 
+                               CharacterSpacing="1" />
+                        <Label x:Name="BalanceLabel" 
+                               FontSize="36" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource White}" />
+                    </VerticalStackLayout>
+                    
+                    <BoxView Grid.Row="1" 
+                             HeightRequest="1" 
+                             BackgroundColor="{StaticResource GlassBorder}" 
+                             Margin="0,16" />
+                    
+                    <HorizontalStackLayout Grid.Row="1" 
+                                           Spacing="12" 
+                                           Margin="0,24,0,0">
+                        <Label Text="Active Users:" TextColor="{StaticResource Gray400}"/>
+                        <Label x:Name="UsersCountLabel" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource AccentCyan}" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </Frame>
 
+            <!-- Action Grid -->
+            <Grid ColumnDefinitions="*, *" 
+                  RowDefinitions="Auto, Auto" 
+                  ColumnSpacing="16" 
+                  RowSpacing="16">
+                
+                <Button Grid.Row="0" Grid.Column="0"
+                        Text="New Transfer" 
+                        Style="{StaticResource AccentButton}"
+                        Clicked="OnNewTransactionClicked" />
 
-    </VerticalStackLayout>
+                <Button Grid.Row="0" Grid.Column="1"
+                        Text="History" 
+                        Style="{StaticResource GlassButton}"
+                        Clicked="OnViewTransactionsClicked" />
+
+                <!-- Security alerts - integrated badge -->
+                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                    <Button x:Name="FraudLogButton" 
+                            Text="Security Alerts" 
+                            Style="{StaticResource GlassButton}"
+                            Clicked="OnFraudLogClicked"
+                            TextColor="{StaticResource StatusError}"
+                            BorderColor="{StaticResource StatusError}" />
+                    
+                    <Frame x:Name="FraudBadgeFrame"
+                           IsVisible="{Binding Source={x:Reference FraudBadge}, Path=IsVisible}"
+                           BackgroundColor="{StaticResource StatusError}"
+                           CornerRadius="10"
+                           Padding="6,2"
+                           HeightRequest="20"
+                           WidthRequest="30"
+                           HorizontalOptions="End"
+                           VerticalOptions="Start"
+                           Margin="0,-8,-8,0"
+                           HasShadow="False">
+                        <Label x:Name="FraudBadge" 
+                               FontSize="10" 
+                               TextColor="{StaticResource White}" 
+                               HorizontalOptions="Center" 
+                               VerticalOptions="Center" />
+                    </Frame>
+                </Grid>
+            </Grid>
+
+            <!-- Admin Section -->
+            <VerticalStackLayout x:Name="AdminPanel" Spacing="12">
+                <Label Text="ADMINISTRATION" 
+                       TextColor="{StaticResource Gray500}" 
+                       FontSize="11" 
+                       FontAttributes="Bold" 
+                       CharacterSpacing="2" />
+                
+                <Button x:Name="AdminUserButton" 
+                        Text="Manage Users" 
+                        IsVisible="False" 
+                        Clicked="OnAdminUserClicked" 
+                        Style="{StaticResource GlassButton}" />
+                
+                <Button x:Name="AdminTxButton" 
+                        Text="Audit Transactions" 
+                        IsVisible="False" 
+                        Clicked="OnAdminTxClicked" 
+                        Style="{StaticResource GlassButton}" />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

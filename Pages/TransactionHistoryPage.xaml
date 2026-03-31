@@ -3,31 +3,58 @@
     x:Class="SecureBankingApp.Pages.TransactionHistoryPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Transaction History"
-    BackgroundColor="Black">
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="Activity Ledger"
+    BackgroundColor="{StaticResource OffBlack}">
 
-    <VerticalStackLayout Padding="20" Spacing="10">
-        <Label Text="Your Transactions" FontSize="24" FontAttributes="Bold" />
+    <VerticalStackLayout Padding="24" Spacing="20">
+        <Label Text="Your Recent Activity" Style="{StaticResource Headline}" HorizontalOptions="Start" FontSize="24" />
 
-        <CollectionView x:Name="TransactionList" ItemsSource="{Binding Transactions}">
+        <CollectionView x:Name="TransactionList">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+            </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Padding="10" Margin="0,6" HasShadow="True">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding Timestamp, StringFormat='{0:dd MMM yyyy HH:mm}'}"
-                     FontSize="14" TextColor="#888" />
-                            <Label Text="{Binding Amount, StringFormat='Amount: {0:C}'}"
-                     FontSize="16" FontAttributes="Bold" />
-                            <Label Text="{Binding Location, StringFormat='Location: {0}'}"
-                     FontSize="14" />
-                            <Label Text="{Binding FromUsername, StringFormat='From: {0}'}" FontSize="14"/>
-                            <Label Text="{Binding ToUsername, StringFormat='To: {0}'}" FontSize="14"/>
-                            <Label Text="{Binding Amount, StringFormat='Amount: {0:C}'}" FontSize="16"/>
+                    <Frame Style="{StaticResource GlassCard}" Padding="16">
+                        <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto">
+                            
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding Timestamp, StringFormat='{0:dd MMM yyyy • HH:mm}'}"
+                                       FontSize="11" 
+                                       TextColor="{StaticResource Gray400}" 
+                                       FontAttributes="None" />
+                                <Label Text="{Binding ToUsername, StringFormat='To: {0}'}" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="{StaticResource White}" />
+                                <Label Text="{Binding Location, StringFormat='Location: {0}'}" 
+                                       FontSize="12" 
+                                       TextColor="{StaticResource Gray500}" />
+                            </VerticalStackLayout>
 
-                        </VerticalStackLayout>
+                            <Label Grid.Column="1" 
+                                   Text="{Binding Amount, StringFormat='{0:C}'}" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" 
+                                   TextColor="{StaticResource AccentGold}" 
+                                   VerticalOptions="Center" />
+                            
+                            <BoxView Grid.Row="1" Grid.ColumnSpan="2" 
+                                     HeightRequest="1" 
+                                     BackgroundColor="{StaticResource GlassBorder}" 
+                                     Margin="0,8,0,0" />
+                        </Grid>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="100" HorizontalOptions="Center" Spacing="10">
+                    <Label Text="No transaction history available." 
+                           TextColor="{StaticResource Gray600}" 
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
         </CollectionView>
     </VerticalStackLayout>
 </ContentPage>

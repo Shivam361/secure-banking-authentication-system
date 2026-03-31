@@ -3,128 +3,98 @@
     x:Class="SecureBankingApp.Pages.OtpPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="OTP Verification"
-    BackgroundColor="Black">
-
-    <ContentPage.Resources>
-        <Color x:Key="ErrorColor">#E74C3C</Color>
-        <Color x:Key="NormalBorder">#DDDDDD</Color>
-        <Color x:Key="NormalBg">White</Color>
-        <Color x:Key="ErrorBg">#FFF6F6</Color>
-        <Color x:Key="SuccessColor">#27AE60</Color>
-    </ContentPage.Resources>
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="Security Verification"
+    BackgroundColor="{StaticResource OffBlack}">
 
     <ContentPage.Content>
-        <VerticalStackLayout
-        Padding="40"
-        Spacing="25"
-        VerticalOptions="Center"
-        HorizontalOptions="Center">
+        <VerticalStackLayout Padding="40" Spacing="40" VerticalOptions="Center">
 
-            <!-- Info label -->
-            <Label
-              Text="Enter the 6-digit code sent to your email"
-              FontSize="16"
-              TextColor="#CCCCCC"
-              HorizontalTextAlignment="Center"
-              LineBreakMode="WordWrap" />
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                <Label Text="Verify Your Identity" Style="{StaticResource Headline}" FontSize="24" />
+                <Label Text="A 6-digit code has been sent to your email." 
+                       Style="{StaticResource SubHeadline}" 
+                       FontSize="13" 
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
 
-            <!-- Grid to layer Frame and Shimmer -->
-            <Grid WidthRequest="300" HeightRequest="80">
+            <Frame Style="{StaticResource GlassCard}" WidthRequest="320">
+                <VerticalStackLayout Spacing="24">
+                    
+                    <!-- Code Input Area -->
+                    <Grid HeightRequest="70">
+                        <Frame x:Name="OtpFrame"
+                               Style="{StaticResource PremiumCard}"
+                               BackgroundColor="{StaticResource Gray800}"
+                               Padding="0"
+                               HasShadow="False">
+                            
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BorderColor" Value="{StaticResource GlassBorder}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Error">
+                                        <VisualState.Setters>
+                                            <Setter Property="BorderColor" Value="{StaticResource StatusError}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
 
-                <!-- Card container for the Entry -->
-                <Frame
-            x:Name="OtpFrame"
-            CornerRadius="5"
-            Padding="0"
-            BackgroundColor="{StaticResource NormalBg}"
-            BorderColor="{StaticResource NormalBorder}"
-            HasShadow="False">
+                            <Entry x:Name="OtpEntry"
+                                   Placeholder="000000"
+                                   Keyboard="Numeric"
+                                   FontSize="28"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource AccentGold}"
+                                   PlaceholderColor="{StaticResource Gray600}"
+                                   MaxLength="6" />
+                        </Frame>
 
-                    <!-- Visual states for normal/error -->
-                    <VisualStateManager.VisualStateGroups>
-                        <VisualStateGroup x:Name="CommonStates">
-                            <VisualState x:Name="Normal">
-                                <VisualState.Setters>
-                                    <Setter Property="BorderColor" Value="{StaticResource NormalBorder}" />
-                                    <Setter Property="BackgroundColor" Value="{StaticResource NormalBg}" />
-                                </VisualState.Setters>
-                            </VisualState>
-                            <VisualState x:Name="Error">
-                                <VisualState.Setters>
-                                    <Setter Property="BorderColor" Value="{StaticResource ErrorColor}" />
-                                    <Setter Property="BackgroundColor" Value="{StaticResource ErrorBg}" />
-                                </VisualState.Setters>
-                            </VisualState>
-                        </VisualStateGroup>
-                    </VisualStateManager.VisualStateGroups>
+                        <BoxView x:Name="Shimmer"
+                                 CornerRadius="20"
+                                 BackgroundColor="{StaticResource White}"
+                                 Opacity="0.1"
+                                 IsVisible="False" />
+                    </Grid>
 
-                    <!-- The actual OTP Entry -->
-                    <Entry
-              x:Name="OtpEntry"
-              Placeholder="Enter code"
-              Keyboard="Numeric"
-              FontSize="20"
-              TextColor="Black"
-              PlaceholderColor="#888"
-              HorizontalOptions="FillAndExpand"
-              Margin="12,8" />
-                </Frame>
+                    <Button x:Name="VerifyButton"
+                            Text="{Binding VerifyButtonText}"
+                            Style="{StaticResource AccentButton}"
+                            Clicked="OnVerifyClicked"
+                            IsEnabled="{Binding IsNotBusy}" />
 
-                <!-- Shimmer overlay -->
-                <BoxView
-            x:Name="Shimmer"
-            CornerRadius="5"
-            BackgroundColor="#EEEEEE"
-            Opacity="0.35"
-            IsVisible="False" />
-            </Grid>
+                    <Button x:Name="ResendButton"
+                            Text="RESEND SECURITY CODE"
+                            Style="{StaticResource GlassButton}"
+                            Clicked="OnResendClicked"
+                            IsEnabled="{Binding CanResend}" />
 
-            <!-- Verify button -->
-            <Button
-          x:Name="VerifyButton"
-          Text="{Binding VerifyButtonText}"
-          Clicked="OnVerifyClicked"
-          IsEnabled="{Binding IsNotBusy}"
-          CornerRadius="5"
-          BackgroundColor="#512BD4"
-          TextColor="White"
-          Padding="12" />
+                    <Label x:Name="ResendCooldownLabel"
+                           FontSize="12"
+                           TextColor="{StaticResource Gray500}"
+                           HorizontalTextAlignment="Center" />
 
-            <!-- Resend Code button -->
-            <Button
-          x:Name="ResendButton"
-          Text="Resend Code"
-          Clicked="OnResendClicked"
-          IsEnabled="{Binding CanResend}"
-          CornerRadius="5"
-          BackgroundColor="Transparent"
-          BorderColor="#512BD4"
-          BorderWidth="1"
-          TextColor="#512BD4"
-          Padding="8"
-          FontSize="14" />
+                </VerticalStackLayout>
+            </Frame>
 
-            <!-- Resend cooldown label -->
-            <Label
-          x:Name="ResendCooldownLabel"
-          FontSize="12"
-          TextColor="#888888"
-          HorizontalTextAlignment="Center" />
+            <VerticalStackLayout Spacing="20">
+                <ActivityIndicator IsVisible="{Binding IsBusy}"
+                                   IsRunning="{Binding IsBusy}"
+                                   Color="{StaticResource AccentGold}"
+                                   HorizontalOptions="Center" />
 
-            <!-- Busy indicator -->
-            <ActivityIndicator
-          IsVisible="{Binding IsBusy}"
-          IsRunning="{Binding IsBusy}"
-          HorizontalOptions="Center" />
+                <Label x:Name="OtpErrorLabel"
+                       FontSize="14"
+                       TextColor="{StaticResource StatusError}"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
 
-            <!-- Error / Status message -->
-            <Label
-          x:Name="OtpErrorLabel"
-          FontSize="14"
-          TextColor="{StaticResource ErrorColor}"
-          HorizontalTextAlignment="Center"
-          LineBreakMode="WordWrap" />
         </VerticalStackLayout>
     </ContentPage.Content>
 </ContentPage>

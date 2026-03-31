@@ -1,24 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     x:Class="SecureBankingApp.Pages.AdminUserListPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="All Users"
-    BackgroundColor="Black">
-    <VerticalStackLayout Padding="16" Spacing="10">
-        <Label Text="All Users" FontSize="26" FontAttributes="Bold" />
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="User Management"
+    BackgroundColor="{StaticResource OffBlack}">
+
+    <VerticalStackLayout Padding="24" Spacing="20">
+        <Label Text="Account Directory" Style="{StaticResource Headline}" HorizontalOptions="Start" FontSize="22" />
+
         <CollectionView x:Name="UserList">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+            </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Padding="8" HasShadow="True" BackgroundColor="DarkGray">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding Username}" FontSize="18" FontAttributes="Bold" />
-                            <Label Text="{Binding Email}" FontSize="15" />
-                            <Label Text="{Binding Balance, StringFormat='Balance: {0:C}'}" FontSize="14" />
-                            <Label Text="{Binding LastLoginIP, StringFormat='Last IP: {0}'}" FontSize="12" TextColor="White"/>
-                        </VerticalStackLayout>
+                    <Frame Style="{StaticResource GlassCard}" Padding="16">
+                        <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto">
+                            
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="{Binding Username}" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold" 
+                                       TextColor="{StaticResource White}" />
+                                <Label Text="{Binding Email}" 
+                                       FontSize="12" 
+                                       TextColor="{StaticResource Gray400}" />
+                                <Label Text="{Binding Role, StringFormat='Tier: {0}'}" 
+                                       FontSize="11" 
+                                       FontAttributes="Bold" 
+                                       TextColor="{StaticResource AccentCyan}" 
+                                       Margin="0,4,0,0"/>
+                            </VerticalStackLayout>
+
+                            <Label Grid.Column="1" 
+                                   Text="{Binding Balance, StringFormat='{0:C}'}" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" 
+                                   TextColor="{StaticResource AccentGold}" 
+                                   VerticalOptions="Start" />
+                            
+                            <BoxView Grid.Row="1" Grid.ColumnSpan="2" 
+                                     HeightRequest="1" 
+                                     BackgroundColor="{StaticResource GlassBorder}" 
+                                     Margin="0,8,0,0" />
+                            
+                            <Label Grid.Row="1" Grid.ColumnSpan="2"
+                                   Text="{Binding LastLoginIP, StringFormat='Last known access point: {0}'}" 
+                                   FontSize="10" 
+                                   TextColor="{StaticResource Gray500}" 
+                                   HorizontalOptions="End" 
+                                   Margin="0,12,0,0" />
+                        </Grid>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="100" HorizontalOptions="Center" Spacing="10">
+                    <Label Text="Directoy index is currently empty." 
+                           TextColor="{StaticResource Gray600}" 
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
         </CollectionView>
     </VerticalStackLayout>
 </ContentPage>

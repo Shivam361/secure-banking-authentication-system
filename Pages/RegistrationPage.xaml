@@ -3,28 +3,65 @@
     x:Class="SecureBankingApp.Pages.RegistrationPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Register"
-    BackgroundColor="Black">
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Title="Premium Enrollment"
+    BackgroundColor="{StaticResource OffBlack}">
 
-    <VerticalStackLayout Padding="30" Spacing="14">
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="30" VerticalOptions="Center">
 
-        <Label Text="Create Account" FontSize="24" FontAttributes="Bold" />
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Create Your Account" Style="{StaticResource Headline}" HorizontalOptions="Start" />
+                <Label Text="Join our secure global banking network." Style="{StaticResource SubHeadline}" HorizontalOptions="Start" />
+            </VerticalStackLayout>
 
-        <Entry x:Name="UsernameEntry" Placeholder="Username" />
-        <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
-        <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" />
-        <Entry x:Name="ConfirmPasswordEntry" Placeholder="Confirm Password" IsPassword="True" />
+            <Frame Style="{StaticResource GlassCard}">
+                <VerticalStackLayout Spacing="18">
 
-        <Button
-            x:Name="RegisterButton"
-            Text="Register"
-            TextColor="White"
-            Clicked="OnRegisterClicked"
-            BackgroundColor="#512BD4"
-            CornerRadius="6" />
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="IDENTIFIER" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
+                        <Entry x:Name="UsernameEntry" Placeholder="Username" />
+                    </VerticalStackLayout>
 
-        <Label x:Name="RegErrorLabel" TextColor="Red" FontSize="14" />
-        <Label x:Name="RegSuccessLabel" TextColor="Green" FontSize="14" />
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="EMAIL ADDRESS" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
+                        <Entry x:Name="EmailEntry" Placeholder="email@example.com" Keyboard="Email" />
+                    </VerticalStackLayout>
 
-    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="SECRET KEY" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
+                        <Entry x:Name="PasswordEntry" Placeholder="••••••••" IsPassword="True" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="CONFIRM KEY" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
+                        <Entry x:Name="ConfirmPasswordEntry" Placeholder="••••••••" IsPassword="True" />
+                    </VerticalStackLayout>
+
+                    <Button x:Name="RegisterButton"
+                            Text="PROCEED TO ENROLLMENT"
+                            Style="{StaticResource AccentButton}"
+                            Clicked="OnRegisterClicked" />
+
+                    <Label x:Name="RegErrorLabel" 
+                           TextColor="{StaticResource StatusError}" 
+                           FontSize="13" 
+                           HorizontalTextAlignment="Center" />
+                    
+                    <Label x:Name="RegSuccessLabel" 
+                           TextColor="{StaticResource StatusSuccess}" 
+                           FontSize="13" 
+                           HorizontalTextAlignment="Center" />
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <Button Text="Already have an account? Login" 
+                    Style="{StaticResource GlassButton}"
+                    Clicked="OnRegisterClicked" 
+                    HorizontalOptions="Center"
+                    FontSize="12" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
