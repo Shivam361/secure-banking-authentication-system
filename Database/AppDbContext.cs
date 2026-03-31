@@ -7,12 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Windows.System;
-
-// Database/AppDbContext.cs
-using Microsoft.Maui.Storage;
-using System.IO;
-
 namespace SecureBankingApp.Database
 {
     public class AppDbContext : DbContext

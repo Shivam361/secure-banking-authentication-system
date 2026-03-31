@@ -99,10 +99,10 @@ namespace SecureBankingApp.Services
                 .OrderByDescending(r => r.ExpiresAt)
                 .FirstOrDefault();
 
-                // 🔥 Cleanup expired OTPs
-var expired = _db.OTPRequests.Where(r => r.ExpiresAt < now);
-_db.OTPRequests.RemoveRange(expired);
-_db.SaveChanges();
+            // Cleanup expired OTPs
+            var expired = _db.OTPRequests.Where(r => r.ExpiresAt < now);
+            _db.OTPRequests.RemoveRange(expired);
+            _db.SaveChanges();
 
             if (req == null) return false;
 

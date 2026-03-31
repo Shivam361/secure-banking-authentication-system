@@ -105,6 +105,4 @@ namespace SecureBankingApp.Services
             _db.SaveChanges();
         }
     }
-
-    }
-
+}

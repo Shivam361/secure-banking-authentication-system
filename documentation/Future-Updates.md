@@ -86,35 +86,34 @@ This document outlines planned improvements for the Secure Banking Authenticatio
 
 ## Phase 4 — Code Quality & Cleanup
 
-### 4.1 Fix Code Formatting Consistency
+### ~~4.1 Fix Code Formatting Consistency~~ ✅ COMPLETED
 
 - Normalize indentation across all files (particularly `AuthService.cs` which has mixed indentation levels from copy-paste).
 
-### 4.2 Remove Duplicate `using` Statements
+### ~~4.2 Remove Duplicate `using` Statements~~ ✅ COMPLETED
 
 - `AppDbContext.cs`: `Microsoft.Maui.Storage` and `System.IO` imported twice
 - `MainPage.xaml.cs`: `Microsoft.Maui.Controls` imported twice
 - `Transaction.cs`: `System` imported twice
 - `NetworkHelper.cs`: `System.Threading.Tasks` imported twice
 
-### 4.3 Remove Platform-Specific Imports from Shared Code
+### ~~4.3 Remove Platform-Specific Imports from Shared Code~~ ✅ COMPLETED
 
 - `FraudDetectionService.cs` and `AppDbContext.cs` contain `using Windows.System;` which locks the code to Windows and will fail on Android/iOS/Mac targets.
 
-### 4.4 Remove Dead & Debug Code
+### ~~4.4 Remove Dead & Debug Code~~ ✅ COMPLETED
 
 - Commented-out debug `DisplayAlert` in `LoginPage.xaml.cs`
 - Unused `dashboard` variable in `OtpPage.xaml.cs`
 - Double-resolved `TransactionPage` in `MainPage.xaml.cs`
 
-### 4.5 Use Shared HttpClient Instance
+### ~~4.5 Use Shared HttpClient Instance~~ ✅ COMPLETED
+- **Implemented:** Refactored `NetworkHelper.cs` to use a `private static readonly HttpClient` instead of creating new instances.
+- **Impact:** Prevents socket exhaustion and ensures efficient connection reuse across the application.
 
-- **Current:** `new HttpClient()` is created inside every method call, exhausting socket handles under load.
-- **Planned:** Use a single static `HttpClient` or `IHttpClientFactory`.
-
-### 4.6 Remove Unused NuGet Package
-
-- `EntityFramework 6.5.1` (EF6 legacy) is referenced alongside `Microsoft.EntityFrameworkCore 8.0.1`. EF6 is completely unused and only bloats the build.
+### ~~4.6 Remove Unused NuGet Package~~ ✅ COMPLETED
+- **Implemented:** Removed the `EntityFramework 6.5.1` (EF6) reference from `SecureBankingApp.csproj`.
+- **Impact:** Smaller build size and clearer dependency management, as the project solely uses EF Core for data access.
 
 ---
 

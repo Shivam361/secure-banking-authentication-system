@@ -102,10 +102,6 @@ namespace SecureBankingApp.Pages
             string loginLocation = await NetworkHelper.GetCurrentLocationAsync();
 
             var normalizedHome = (user.HomeLocation ?? "").Trim().ToLowerInvariant();
-            var normalizedLogin = (loginLocation ?? "").Trim().ToLowerInvariant();
-
-           // await DisplayAlert("Debug", $"Home: '{normalizedHome}'\nLogin: '{normalizedLogin}'", "OK");
-
             // Only log fraud if the locations are not similar
             if (!string.IsNullOrEmpty(normalizedHome) && !string.IsNullOrEmpty(normalizedLogin) &&
                 !_fraud.LocationsAreSimilar(loginLocation, user.HomeLocation))
