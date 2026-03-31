@@ -2,6 +2,7 @@ using Microsoft.Maui.Controls;
 using SecureBankingApp.Database;
 using SecureBankingApp.Services;
 using SecureBankingApp.Models;
+using SecureBankingApp.Helpers;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -35,6 +36,19 @@ namespace SecureBankingApp.Pages
                 || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirm))
             {
                 RegErrorLabel.Text = "All fields are required.";
+                return;
+            }
+
+            // --- New Validation logic ---
+            if (!ValidationHelper.IsValidEmail(email))
+            {
+                RegErrorLabel.Text = "Please enter a valid email address.";
+                return;
+            }
+
+            if (!ValidationHelper.IsValidPassword(password, out string passwordError))
+            {
+                RegErrorLabel.Text = passwordError;
                 return;
             }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +10,7 @@ namespace SecureBankingApp.Models
     {
         public int Id { get; set; }
         public string? Username { get; set; }
-        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string? IPAddress { get; set; }
         public bool IsSuccessful { get; set; }
     }

@@ -61,30 +61,26 @@ This document outlines planned improvements for the Secure Banking Authenticatio
 
 ## Phase 3 — Data & Logic Bug Fixes
 
-### 3.1 Fix HomeLocation Registration Bug
+### ~~3.1 Fix HomeLocation Registration Bug~~ ✅ COMPLETED
+- **Implemented:** Removed the logic error in `RegistrationPage.xaml.cs` where the geographic location string was being overwritten by the raw IP address. Registration now correctly stores strings like "London, UK", matching the format used during login.
+- **Impact:** Fraud detection now works correctly by comparing human-readable location strings instead of comparing a city against an IP.
 
-- **Current:** During registration, the geo-location result is fetched but immediately overwritten with the raw IP address (`homeLocation = ip;`). This means fraud detection compares an IP string against a city string — they never match, causing every login to be falsely flagged.
-- **Planned:** Remove the overwriting line so the actual geo-location (e.g., `"London, UK"`) is stored.
-
-### 3.2 Standardize DateTime Usage
-
-- **Current:** `LoginAttempt.Timestamp` uses `DateTime.Now` (local time) while every other model uses `DateTime.UtcNow`. This mismatch breaks time-window queries in fraud detection.
-- **Planned:** Standardize all timestamps to `DateTime.UtcNow`.
+### ~~3.2 Standardize DateTime Usage~~ ✅ COMPLETED
+- **Implemented:** Changed the default value of `LoginAttempt.Timestamp` from `DateTime.Now` to `DateTime.UtcNow`. This ensures all timestamps throughout the system (OTP, Transactions, Fraud Logs, and Login Attempts) are using the same global reference.
+- **Impact:** Fixes time-window logic in fraud detection and ensures cross-timezone reliability.
 
 ### ~~3.3 Fix OTP Validation Order~~ ✅ COMPLETED
 
 - **Current:** `ValidateOtp()` queries for a matching OTP, then runs a cleanup of all expired OTPs (which may delete the matched one), then checks if the query returned null.
 - **Planned:** Reorder logic — validate and consume the OTP first, then clean up expired records.
 
-### 3.4 Add Password Strength Validation
+### ~~3.4 Add Password Strength Validation~~ ✅ COMPLETED
+- **Implemented:** Added a complexity check requiring 8+ characters, one uppercase, one lowercase, one digit, and one special character. Integrated specific error messaging in the `RegistrationPage`.
+- **Impact:** Prevents the use of easily guessable or weak passwords.
 
-- **Current:** Registration accepts any password, including empty or single-character strings.
-- **Planned:** Enforce minimum length (e.g., 8 characters), require mixed case, digits, and special characters.
-
-### 3.5 Add Email Validation
-
-- **Current:** Registration accepts any string as an email address.
-- **Planned:** Add regex or `MailAddress` validation to ensure proper email format.
+### ~~3.5 Add Email Format Validation~~ ✅ COMPLETED
+- **Implemented:** Added Regex-based email validation to the registration flow to ensure users provide a syntactically correct email address.
+- **Impact:** Improves data quality and ensures MFA (which relies on email) can function correctly.
 
 ---
 
