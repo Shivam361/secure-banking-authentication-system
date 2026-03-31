@@ -14,6 +14,7 @@ namespace SecureBankingApp.Pages
     {
         readonly AuthService _auth;
         readonly FraudDetectionService _fraud;
+        readonly IServiceProvider _services;
 
         bool _isBusy;
         public new bool IsBusy
@@ -32,19 +33,19 @@ namespace SecureBankingApp.Pages
         public bool IsNotBusy => !IsBusy;
         public string LoginButtonText => IsBusy ? "Processing…" : "Login";
 
-        public LoginPage()
+        public LoginPage(AuthService auth, FraudDetectionService fraud, IServiceProvider services)
         {
             InitializeComponent();
             BindingContext = this;
 
-            // resolve services from the DI container
-            _auth = MauiProgram.ServiceProvider.GetRequiredService<AuthService>();
-            _fraud = MauiProgram.ServiceProvider.GetRequiredService<FraudDetectionService>();
+            _auth = auth;
+            _fraud = fraud;
+            _services = services;
         }
 
         private async void OnRegisterButtonClicked(object sender, EventArgs e)
         {
-            var regPage = MauiProgram.ServiceProvider.GetRequiredService<RegistrationPage>();
+            var regPage = _services.GetRequiredService<RegistrationPage>();
             await Navigation.PushAsync(regPage);
         }
 
@@ -148,7 +149,7 @@ namespace SecureBankingApp.Pages
 
             // Navigate to OTP page
             await Navigation.PushAsync(
-                MauiProgram.ServiceProvider.GetRequiredService<OtpPage>()
+                _services.GetRequiredService<OtpPage>()
             );
         }
         /// <summary>

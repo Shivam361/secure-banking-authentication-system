@@ -12,6 +12,7 @@ namespace SecureBankingApp.Pages
     public partial class OtpPage : ContentPage, INotifyPropertyChanged
     {
         readonly AuthService _auth;
+        readonly IServiceProvider _services;
         readonly string _username;
         readonly string _userEmail;
 
@@ -46,12 +47,13 @@ namespace SecureBankingApp.Pages
         public bool IsNotBusy => !IsBusy;
         public string VerifyButtonText => IsBusy ? "Verifying…" : "Verify Code";
 
-        public OtpPage(AuthService auth, AppDbContext db)
+        public OtpPage(AuthService auth, AppDbContext db, IServiceProvider services)
         {
             InitializeComponent();
             BindingContext = this;
 
-            _auth = MauiProgram.ServiceProvider.GetRequiredService<AuthService>();
+            _auth = auth;
+            _services = services;
             _username = auth.CurrentUsername!;
 
             // Look up the user's email for resend
@@ -86,7 +88,7 @@ namespace SecureBankingApp.Pages
 
             // 6) Success → navigate
             await Navigation.PushAsync(
-                MauiProgram.ServiceProvider.GetRequiredService<MainPage>()
+                _services.GetRequiredService<MainPage>()
             );
         }
 
