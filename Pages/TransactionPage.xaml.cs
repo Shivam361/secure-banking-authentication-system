@@ -99,6 +99,21 @@ namespace SecureBankingApp.Pages
                 return;
             }
 
+            // Transaction Re-Auth (High Value Transfers)
+            if (amt >= 500)
+            {
+                var (emailSent, otpCode) = await _auth.GenerateAndSendOtpAsync(_username, fromUser.Email);
+                string message = emailSent ? "An OTP has been sent to your email." : $"Dev Mode OTP: {otpCode}";
+                string result = await DisplayPromptAsync("Secure Transfer", $"{message}\nPlease enter the OTP to confirm:", "Confirm", "Cancel", "123456", 6, Keyboard.Numeric);
+
+                if (string.IsNullOrWhiteSpace(result) || !_auth.ValidateOtp(_username, result.Trim()))
+                {
+                    TxErrorLabel.Text = "OTP verification failed. Transfer cancelled.";
+                    IsBusy = false;
+                    return;
+                }
+            }
+
             // Simulate network processing
             await System.Threading.Tasks.Task.Delay(800);
 
@@ -139,11 +154,6 @@ namespace SecureBankingApp.Pages
                     fraudService.ProcessTransaction(tx);
                 } catch { } 
             });
-
-            if (amt >= 500)
-            {
-                await DisplayAlert("Notice", "Large transactions may be subject to review.", "OK");
-            }
 
             IsBusy = false;
             TxSuccessLabel.Text = $"Sent {amt:C} to {toUser}.";

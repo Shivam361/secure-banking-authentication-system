@@ -1,0 +1,3 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+D:\Masters\Github\secure-banking-authentication-system\Pages\OtpPage.xaml.cs(62,62): error CS8072: An expression tree lambda may not contain a null propagating operator. [D:\Masters\Github\secure-banking-authentication-system\SecureBankingApp.csproj::TargetFramework=net9.0-windows10.0.19041.0]

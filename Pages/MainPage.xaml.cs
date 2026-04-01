@@ -13,6 +13,7 @@ namespace SecureBankingApp.Pages
         readonly IAuthService _auth;
         readonly IRoleGuardService _guard;
         readonly IServiceProvider _services;
+        readonly ISessionService _session;
 
         protected override async void OnAppearing()
         {
@@ -87,13 +88,14 @@ namespace SecureBankingApp.Pages
             }
         }
 
-        public MainPage(AppDbContext db, IAuthService auth, IRoleGuardService guard, IServiceProvider services)
+        public MainPage(AppDbContext db, IAuthService auth, IRoleGuardService guard, IServiceProvider services, ISessionService session)
         {
             InitializeComponent();
             _db = db;
             _auth = auth;
             _guard = guard;
             _services = services;
+            _session = session;
 
             // Show admin controls on initial load
             AdminUserButton.IsVisible = guard.IsAdmin;

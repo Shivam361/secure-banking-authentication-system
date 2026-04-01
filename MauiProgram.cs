@@ -35,7 +35,7 @@ namespace SecureBankingApp
             // --- Register EF Core DbContext ---
             var dbPath = Path.Combine(FileSystem.AppDataDirectory, "banking.db");
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlite($"Data Source={dbPath}"), ServiceLifetime.Transient);
+                options.UseSqlite($"Data Source={dbPath};Password=SuperSecretBankKey2026!"), ServiceLifetime.Transient);
 
             // --- Register application services ---
             // Singleton: no database dependency — safe to live for the app's lifetime
@@ -46,6 +46,7 @@ namespace SecureBankingApp
             builder.Services.AddTransient<IAuthService, AuthService>();
             builder.Services.AddTransient<IFraudDetectionService, FraudDetectionService>();
             builder.Services.AddTransient<IRoleGuardService, RoleGuardService>();
+            builder.Services.AddTransient<IAuditService, AuditService>();
 
             // --- Register pages for DI navigation ---
             builder.Services.AddTransient<LoginPage>();

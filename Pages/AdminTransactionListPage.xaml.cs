@@ -14,14 +14,16 @@ namespace SecureBankingApp.Pages
         private readonly ISessionService _session;
         private readonly IServiceProvider _services;
         private readonly IRoleGuardService _guard;
+        private readonly IAuditService _audit;
         public ObservableCollection<Transaction> Transactions { get; set; }
 
-        public AdminTransactionListPage(IServiceProvider services, ISessionService session, IRoleGuardService guard)
+        public AdminTransactionListPage(IServiceProvider services, ISessionService session, IRoleGuardService guard, IAuditService audit)
         {
             InitializeComponent();
             _guard = guard;
             _services = services;
             _session = session;
+            _audit = audit;
             Transactions = new ObservableCollection<Transaction>();
             TxList.ItemsSource = Transactions;
         }
@@ -40,6 +42,8 @@ namespace SecureBankingApp.Pages
             // 2. Role Guard
             if (!await _guard.EnforceRoleAsync(this, UserRole.Admin))
                 return;
+
+            _audit.LogAction(_session.CurrentUsername!, "Accessed Transaction Audit Log");
 
             // 3. Fetch fresh transactions
             using var scope = _services.CreateScope();

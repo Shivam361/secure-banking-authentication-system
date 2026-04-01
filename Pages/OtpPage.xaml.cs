@@ -13,6 +13,7 @@ namespace SecureBankingApp.Pages
     {
         readonly IAuthService _auth;
         readonly IServiceProvider _services;
+        readonly ISessionService _session;
         readonly string _username;
         readonly string _userEmail;
 
@@ -57,9 +58,10 @@ namespace SecureBankingApp.Pages
             _session = session;
             _username = auth.CurrentUsername ?? "";
 
-            // Look up the user's email for resend
-            var user = db.Users.SingleOrDefault(u => u.Id == _session.CurrentUser?.Id);
-            _userEmail = user?.Email ?? "";
+        // Look up the user's email for resend
+        var currentUserId = _session.CurrentUser?.Id;
+        var user = currentUserId != null ? db.Users.SingleOrDefault(u => u.Id == currentUserId) : null;
+        _userEmail = user?.Email ?? "";
         }
 
         protected override async void OnAppearing()

@@ -20,6 +20,7 @@ namespace SecureBankingApp.Database
 
         public DbSet<OTPRequest> OTPRequests => Set<OTPRequest>();
         public DbSet<Transaction> Transactions => Set<Transaction>();
+        public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
         private static bool _created;
         public AppDbContext(DbContextOptions<AppDbContext> options)
     : base(options)
@@ -35,7 +36,7 @@ namespace SecureBankingApp.Database
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             var path = Path.Combine(FileSystem.AppDataDirectory, "banking.db");
-            options.UseSqlite($"Data Source={path}");
+            options.UseSqlite($"Data Source={path};Password=SuperSecretBankKey2026!");
         }
     }
 }
