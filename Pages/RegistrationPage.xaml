@@ -58,7 +58,7 @@
 
             <Button Text="Already have an account? Login" 
                     Style="{StaticResource GlassButton}"
-                    Clicked="OnRegisterClicked" 
+                    Clicked="OnLoginRedirectClicked" 
                     HorizontalOptions="Center"
                     FontSize="12" />
 

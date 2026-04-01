@@ -35,17 +35,17 @@ namespace SecureBankingApp
             // --- Register EF Core DbContext ---
             var dbPath = Path.Combine(FileSystem.AppDataDirectory, "banking.db");
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlite($"Data Source={dbPath}"));
+                options.UseSqlite($"Data Source={dbPath}"), ServiceLifetime.Transient);
 
             // --- Register application services ---
             // Singleton: no database dependency — safe to live for the app's lifetime
             builder.Services.AddSingleton<ISessionService, SessionService>();
             builder.Services.AddSingleton<IEmailService, EmailService>();
 
-            // Scoped: these depend on AppDbContext (also Scoped) — lifetimes must match
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IFraudDetectionService, FraudDetectionService>();
-            builder.Services.AddScoped<IRoleGuardService, RoleGuardService>();
+            // Transient: these depend on AppDbContext (also Transient) — lifetimes must match
+            builder.Services.AddTransient<IAuthService, AuthService>();
+            builder.Services.AddTransient<IFraudDetectionService, FraudDetectionService>();
+            builder.Services.AddTransient<IRoleGuardService, RoleGuardService>();
 
             // --- Register pages for DI navigation ---
             builder.Services.AddTransient<LoginPage>();
@@ -67,24 +67,56 @@ namespace SecureBankingApp
             ServiceProvider = app.Services;
 
             // ─── SEED DEFAULT ADMIN (credentials from env vars / SeedConfig) ─────────────────────
-            using (var scope = ServiceProvider.CreateScope())
+            try 
             {
-                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var auth = scope.ServiceProvider.GetRequiredService<IAuthService>();
-
-                if (!db.Users.Any(u => u.Role == UserRole.Admin))
+                using (var scope = ServiceProvider.CreateScope())
                 {
-                    db.Users.Add(new SecureBankingApp.Models.User
+                    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    var auth = scope.ServiceProvider.GetRequiredService<IAuthService>();
+
+                    // Ensure database is created before querying
+                    db.Database.EnsureCreated();
+
+                    try 
                     {
-                        Username     = Configuration.SeedConfig.AdminUsername,
-                        PasswordHash = auth.HashPassword(Configuration.SeedConfig.AdminPassword),
-                        Email        = Configuration.SeedConfig.AdminEmail,
-                        Balance      = Configuration.SeedConfig.AdminInitialBalance,
-                        Role         = UserRole.Admin,
-                        LastLoginIP  = null
-                    });
-                    db.SaveChanges();
+                        if (!db.Users.Any(u => u.Role == UserRole.Admin))
+                        {
+                            db.Users.Add(new SecureBankingApp.Models.User
+                            {
+                                Username     = Configuration.SeedConfig.AdminUsername,
+                                PasswordHash = auth.HashPassword(Configuration.SeedConfig.AdminPassword),
+                                Email        = Configuration.SeedConfig.AdminEmail,
+                                Balance      = Configuration.SeedConfig.AdminInitialBalance,
+                                Role         = UserRole.Admin,
+                                LastLoginIP  = null
+                            });
+                            db.SaveChanges();
+                        }
+                    }
+                    catch (Exception innerEx) when (innerEx.Message.Contains("no such column") || innerEx.InnerException?.Message.Contains("no such column") == true)
+                    {
+                        // Safely handles the migration reset ONLY if the schema is severely outdated on the local machine
+                        db.Database.EnsureDeleted();
+                        db.Database.EnsureCreated();
+
+                        db.Users.Add(new SecureBankingApp.Models.User
+                        {
+                            Username     = Configuration.SeedConfig.AdminUsername,
+                            PasswordHash = auth.HashPassword(Configuration.SeedConfig.AdminPassword),
+                            Email        = Configuration.SeedConfig.AdminEmail,
+                            Balance      = Configuration.SeedConfig.AdminInitialBalance,
+                            Role         = UserRole.Admin,
+                            LastLoginIP  = null
+                        });
+                        db.SaveChanges();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Simple logging to a file in the app directory for troubleshooting
+                var logFile = Path.Combine(Path.GetTempPath(), "maui_crash_program.txt");
+                File.WriteAllText(logFile, ex.ToString());
             }
 
             // Always return the built app

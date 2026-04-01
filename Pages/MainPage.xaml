@@ -95,7 +95,7 @@
                             BorderColor="{StaticResource StatusError}" />
                     
                     <Frame x:Name="FraudBadgeFrame"
-                           IsVisible="{Binding Source={x:Reference FraudBadge}, Path=IsVisible}"
+                           IsVisible="False"
                            BackgroundColor="{StaticResource StatusError}"
                            CornerRadius="10"
                            Padding="6,2"

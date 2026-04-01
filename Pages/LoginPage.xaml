@@ -27,37 +27,37 @@
                        HeightRequest="80" 
                        WidthRequest="80" 
                        Padding="0"
-                       BackgroundColor="{StaticResource GlassBackground}"
-                       BorderColor="{StaticResource GlassBorder}">
+                       BackgroundColor="{DynamicResource GlassBackground}"
+                       BorderColor="{DynamicResource GlassBorder}">
                     <Label Text="S" 
                            FontSize="40" 
                            FontAttributes="Bold" 
-                           TextColor="{StaticResource AccentGold}"
+                           TextColor="{DynamicResource AccentGold}"
                            HorizontalOptions="Center" 
                            VerticalOptions="Center" />
                 </Frame>
                 <Label Text="SECURE BANK" 
-                       Style="{StaticResource Headline}" 
+                       Style="{DynamicResource Headline}" 
                        FontSize="24"/>
                 <Label Text="Institutional Grade Security" 
-                       Style="{StaticResource SubHeadline}" 
+                       Style="{DynamicResource SubHeadline}" 
                        FontSize="14"/>
             </VerticalStackLayout>
 
             <!-- Login Card -->
-            <Frame Style="{StaticResource GlassCard}" 
+            <Frame Style="{DynamicResource GlassCard}" 
                    WidthRequest="350">
                 
                 <VerticalStackLayout Spacing="24">
                     
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Username" TextColor="{StaticResource Gray300}" FontSize="12" Margin="4,0"/>
+                        <Label Text="Username" TextColor="{DynamicResource Gray300}" FontSize="12" Margin="4,0"/>
                         <Entry x:Name="UsernameEntry" 
                                Placeholder="Enter your username" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Password" TextColor="{StaticResource Gray300}" FontSize="12" Margin="4,0"/>
+                        <Label Text="Password" TextColor="{DynamicResource Gray300}" FontSize="12" Margin="4,0"/>
                         <Entry x:Name="PasswordEntry" 
                                Placeholder="••••••••" 
                                IsPassword="True" />
@@ -65,17 +65,17 @@
 
                     <Button x:Name="LoginButton" 
                             Text="{Binding LoginButtonText}" 
-                            Style="{StaticResource AccentButton}"
+                            Style="{DynamicResource AccentButton}"
                             Clicked="OnLoginClicked"
                             IsEnabled="{Binding IsNotBusy}" />
 
                     <Button Text="Create New Account" 
-                            Style="{StaticResource GlassButton}"
+                            Style="{DynamicResource GlassButton}"
                             Clicked="OnRegisterButtonClicked" />
 
                     <ActivityIndicator IsVisible="{Binding IsBusy}" 
                                        IsRunning="{Binding IsBusy}" 
-                                       Color="{StaticResource AccentGold}"
+                                       Color="{DynamicResource AccentGold}"
                                        HorizontalOptions="Center" />
 
                 </VerticalStackLayout>
@@ -83,7 +83,7 @@
 
             <!-- Error Message -->
             <Label x:Name="ErrorLabel" 
-                   TextColor="{StaticResource StatusError}" 
+                   TextColor="{DynamicResource StatusError}" 
                    FontSize="14" 
                    HorizontalOptions="Center" 
                    HorizontalTextAlignment="Center"

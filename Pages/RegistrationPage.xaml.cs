@@ -80,5 +80,9 @@ namespace SecureBankingApp.Pages
             RegSuccessLabel.Text = "Registration successful! You can now login.";
             UsernameEntry.Text = EmailEntry.Text = PasswordEntry.Text = ConfirmPasswordEntry.Text = "";
         }
+        async void OnLoginRedirectClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopAsync();
+        }
     }
 }

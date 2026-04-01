@@ -1,14 +1,13 @@
-﻿using Microsoft.Maui.Controls;
-using SecureBankingApp.Pages;
+using Microsoft.Maui.Controls;
 
 namespace SecureBankingApp
 {
     public partial class App : Application
     {
-        public App(LoginPage loginPage)
+        public App()
         {
             InitializeComponent();
-            MainPage = new NavigationPage(loginPage);
+            MainPage = new AppShell();
         }
     }
 }

@@ -17,12 +17,16 @@ namespace SecureBankingApp.Pages
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            var user = _db.Users.Single(u => u.Username == _auth.CurrentUsername);
+            if (string.IsNullOrEmpty(_auth.CurrentUsername)) return;
+
+            var user = _db.Users.SingleOrDefault(u => u.Username == _auth.CurrentUsername);
+            if (user == null) return;
+
             BalanceLabel.Text = $"Balance: {user.Balance:C}";
             // Fraud logs relevant to this user
             var userLogs = _db.FraudLogs.Where(f => f.Description.Contains(user.Username)).ToList();
             FraudBadge.Text = userLogs.Count.ToString();
-            FraudBadge.IsVisible = userLogs.Count > 0;
+            FraudBadgeFrame.IsVisible = userLogs.Count > 0;
             // Show admin controls based on role
             AdminUserButton.IsVisible = _guard.IsAdmin;
             AdminTxButton.IsVisible = _guard.IsAdmin;
