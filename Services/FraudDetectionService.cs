@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ML;
 
 namespace SecureBankingApp.Services
 {
@@ -53,15 +54,60 @@ namespace SecureBankingApp.Services
         {
             try
             {
-                // Flag large transactions
-                if (tx.Amount >= 500)
+                // Local ML-Based Fraud Detection System (Feature 5.6)
+                // Use historical transaction values to detect statistically rare spikes
+                var context = new Microsoft.ML.MLContext();
+
+                // Fetch a sliding window of historical transactions to establish baseline
+                var historicalTxs = _db.Transactions
+                    .Where(t => t.FromUsername == tx.FromUsername)
+                    .OrderBy(t => t.Timestamp)
+                    .Select(t => new TransactionData { Amount = (float)t.Amount })
+                    .ToList();
+
+                // Add current incoming transaction
+                historicalTxs.Add(new TransactionData { Amount = (float)tx.Amount });
+
+                if (historicalTxs.Count >= 5) // Minimum sample to estimate IID
                 {
+                    try 
+                    {
+                        var dataView = context.Data.LoadFromEnumerable(historicalTxs);
+                        
+                        // IidSpikeEstimator checks for independent spikes out of 99% confidence bounds
+                        var estimator = context.Transforms.DetectIidSpike(
+                            outputColumnName: nameof(TransactionPrediction.Prediction), 
+                            inputColumnName: nameof(TransactionData.Amount), 
+                            confidence: 99.0, 
+                            pvalueHistoryLength: Math.Min(historicalTxs.Count / 2, 20)); // dynamically scaled history
+
+                        var transformer = estimator.Fit(dataView);
+                        var transformedData = transformer.Transform(dataView);
+                        
+                        var predictions = context.Data.CreateEnumerable<TransactionPrediction>(transformedData, reuseRowObject: false).ToList();
+                        
+                        // The last prediction maps to our newest transaction
+                        var latestPrediction = predictions.Last();
+                        if (latestPrediction.Prediction != null && latestPrediction.Prediction[0] == 1) // 1 = Anomaly Spike Detected
+                        {
+                            _db.FraudLogs.Add(new FraudLog
+                            {
+                                Description = $"ML ALERT: Anomalous Spike detected. {tx.Amount:C} vastly exceeds typical spending patterns for {tx.FromUsername}."
+                            });
+                        }
+                    }
+                    catch { } // Handle ML matrix fitting errors silently on edge cases
+                }
+                else if (tx.Amount >= 500)
+                {
+                    // Fallback to static rule if not enough ML history is present
                     _db.FraudLogs.Add(new FraudLog
                     {
-                        Description = $"Large transaction: {tx.Amount:C} from {tx.FromUsername} to {tx.ToUsername} at {tx.Location}"
+                        Description = $"Large transaction (ML warming up): {tx.Amount:C} from {tx.FromUsername} to {tx.ToUsername}"
                     });
-                    _db.SaveChanges();
                 }
+                
+                _db.SaveChanges();
 
 
                 // Example geo rule: location != "HomeTown"

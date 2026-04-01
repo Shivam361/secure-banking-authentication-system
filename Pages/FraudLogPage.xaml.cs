@@ -42,7 +42,8 @@ namespace SecureBankingApp.Pages
             using var scope = _services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             
-            var user = _session.CurrentUser!;
+            var user = _session.GetCurrentUser(_services);
+            if (user == null) return;
             
             Logs.Clear();
             List<FraudLog> freshLogs;

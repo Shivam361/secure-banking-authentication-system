@@ -24,10 +24,19 @@ namespace SecureBankingApp.Services
         /// </summary>
         public User? GetCurrentUser()
         {
-            if (string.IsNullOrEmpty(_session.CurrentUsername))
+            if (string.IsNullOrEmpty(_session.CurrentJwtToken))
                 return null;
 
-            return _db.Users.SingleOrDefault(u => u.Username == _session.CurrentUsername);
+            try 
+            {
+                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var jwtTask = handler.ReadJwtToken(_session.CurrentJwtToken);
+                var username = jwtTask.Claims.FirstOrDefault(c => c.Type == "unique_name" || c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (string.IsNullOrEmpty(username)) return null;
+                return _db.Users.SingleOrDefault(u => u.Username == username);
+            }
+            catch { return null; }
         }
 
         /// <summary>

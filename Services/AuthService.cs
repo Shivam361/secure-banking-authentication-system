@@ -8,6 +8,10 @@ using SecureBankingApp.Database;
 using SecureBankingApp.Models;
 using System.Security.Cryptography;
 
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+
 namespace SecureBankingApp.Services
 {
     public class AuthService : IAuthService
@@ -16,6 +20,9 @@ namespace SecureBankingApp.Services
         private readonly IEmailService _emailService;
         private readonly ISessionService _session;
         private readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
+
+        // Hardcoded key for local development proof of concept
+        private const string JwtSecret = "SecureBankingAppSuperSecretJwtKey123!@#";
 
         // BCrypt work factor — 2^11 iterations; increase to 12+ as hardware improves
         private const int WorkFactor = 11;
@@ -27,17 +34,44 @@ namespace SecureBankingApp.Services
             _session = session;
         }
 
-        /// <summary>
-        /// Hash a plaintext password using BCrypt with an auto-generated salt.
-        /// Returns a 60-character BCrypt hash string (includes algorithm, cost, salt, and hash).
-        /// </summary>
+        private string GenerateJwtToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(JwtSecret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Username),
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, user.Role.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
         public string HashPassword(string plain)
         {
             return BCrypt.Net.BCrypt.HashPassword(plain, workFactor: WorkFactor);
         }
 
-        /// <summary>Read-through to SessionService for backward compatibility.</summary>
-        public string? CurrentUsername => _session.CurrentUsername;
+        public string? CurrentUsername 
+        { 
+            get 
+            {
+                if (string.IsNullOrEmpty(_session.CurrentJwtToken)) return null;
+                try
+                {
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtTask = handler.ReadJwtToken(_session.CurrentJwtToken);
+                    return jwtTask.Claims.FirstOrDefault(c => c.Type == "unique_name" || c.Type == ClaimTypes.NameIdentifier)?.Value;
+                }
+                catch { return null; }
+            }
+        }
 
         /// <summary>
         /// Verify login credentials using BCrypt's timing-safe comparison.
@@ -67,8 +101,9 @@ namespace SecureBankingApp.Services
                 _db.Users.Update(user);
                 _db.SaveChanges();
 
-                // Record in session
-                _session.Login(user);
+                // Generate and record JWT in session
+                var jwt = GenerateJwtToken(user);
+                _session.SetToken(jwt);
             }
             else
             {

@@ -1,26 +1,48 @@
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using SecureBankingApp.Database;
+using SecureBankingApp.Models;
+
 namespace SecureBankingApp.Services
 {
-    /// <summary>
-    /// Holds the current user's session state (who is logged in).
-    /// Registered as Singleton because it must survive across page navigations
-    /// and scoped service lifetimes. Contains NO database dependency.
-    /// </summary>
     public class SessionService : ISessionService
     {
-        public SecureBankingApp.Models.User? CurrentUser { get; private set; }
+        public bool IsAuthenticated => !string.IsNullOrEmpty(CurrentJwtToken);
 
-        public string? CurrentUsername => CurrentUser?.Username;
+        public string? CurrentJwtToken { get; private set; }
 
-        public bool IsAuthenticated => CurrentUser != null;
-
-        public void Login(SecureBankingApp.Models.User user)
+        public void SetToken(string jwtToken)
         {
-            CurrentUser = user;
+            CurrentJwtToken = jwtToken;
+        }
+
+        public User? GetCurrentUser(IServiceProvider services)
+        {
+            if (string.IsNullOrEmpty(CurrentJwtToken)) return null;
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtTask = handler.ReadJwtToken(CurrentJwtToken);
+                var usernameClaim = jwtTask.Claims.FirstOrDefault(c => c.Type == "unique_name")?.Value;
+
+                if (string.IsNullOrEmpty(usernameClaim)) return null;
+
+                using var scope = services.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                return db.Users.SingleOrDefault(u => u.Username == usernameClaim);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public void Logout()
         {
-            CurrentUser = null;
+            CurrentJwtToken = null;
         }
     }
 }

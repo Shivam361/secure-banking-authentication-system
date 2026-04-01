@@ -5,19 +5,19 @@ namespace SecureBankingApp.Services
     /// </summary>
     public interface ISessionService
     {
-        /// <summary>The full user object of the currently authenticated session, or null.</summary>
-        SecureBankingApp.Models.User? CurrentUser { get; }
-
-        /// <summary>The username of the currently authenticated user, or null.</summary>
-        string? CurrentUsername { get; }
-
-        /// <summary>True when a user has been authenticated.</summary>
+        /// <summary>True if there is an active valid JWT Token.</summary>
         bool IsAuthenticated { get; }
 
-        /// <summary>Starts a new session for the given user.</summary>
-        void Login(SecureBankingApp.Models.User user);
+        /// <summary>Gets the stored JWT token.</summary>
+        string? CurrentJwtToken { get; }
 
-        /// <summary>Clears the session (logout).</summary>
+        /// <summary>Establishes an active stateless session with a JWT.</summary>
+        void SetToken(string jwtToken);
+
+        /// <summary>Retrieves the dynamically decoded user from the local DB based on the JWT claim.</summary>
+        SecureBankingApp.Models.User? GetCurrentUser(System.IServiceProvider services);
+
+        /// <summary>Destroys the current unencrypted JWT from local memory.</summary>
         void Logout();
     }
 }

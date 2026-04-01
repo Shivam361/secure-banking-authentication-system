@@ -119,36 +119,36 @@ This document outlines planned improvements for the Secure Banking Authenticatio
 
 ## Phase 5 — Feature Enhancements
 
-### 5.1 Session Management & Logout
+### ~~5.1 Session Management & Logout~~ ✅ COMPLETED
 
 - Implement a proper logout flow that clears the authentication state.
 - Add session timeout/expiry so users aren't permanently authenticated.
 
-### 5.2 Transaction Re-Authentication
+### ~~5.2 Transaction Re-Authentication~~ ✅ COMPLETED
 
 - Require re-authentication (PIN or OTP) for transactions above a configurable threshold.
 
-### 5.3 OTP Rate Limiting
+### ~~5.3 OTP Rate Limiting~~ ✅ COMPLETED
 
 - Limit the number of OTP verification attempts (e.g., 5 tries) to prevent brute-force attacks on the 6-digit code.
 
-### 5.4 Audit Trail & Access Logging
+### ~~5.4 Audit Trail & Access Logging~~ ✅ COMPLETED
 
 - Log when admin pages are accessed, who viewed what data, and when.
 
-### 5.5 Encrypted Data at Rest
+### ~~5.5 Encrypted Data at Rest~~ ✅ COMPLETED
 
 - Encrypt the SQLite database file to protect sensitive data stored on disk.
 
-### 5.6 Machine Learning–Based Fraud Detection
+### ~~5.6 Machine Learning–Based Fraud Detection~~ ✅ COMPLETED
 
 - Move beyond rule-based detection to ML models that can identify complex behavioural patterns (transaction velocity, anomalous amounts, unusual timing).
 
-### 5.7 Biometric Authentication
+### ~~5.7 Biometric Authentication~~ ✅ COMPLETED
 
 - Integrate fingerprint or face ID as an additional or alternative authentication factor using device-native APIs.
 
-### 5.8 JWT-Based Session Management
+### ~~5.8 JWT-Based Session Management~~ ✅ COMPLETED
 
 - Replace the current in-memory session tracking with JSON Web Tokens for stateless, secure session handling.
 

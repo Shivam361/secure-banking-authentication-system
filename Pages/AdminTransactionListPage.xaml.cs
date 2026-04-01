@@ -43,7 +43,7 @@ namespace SecureBankingApp.Pages
             if (!await _guard.EnforceRoleAsync(this, UserRole.Admin))
                 return;
 
-            _audit.LogAction(_session.CurrentUsername!, "Accessed Transaction Audit Log");
+            _audit.LogAction(_session.GetCurrentUser(_services)?.Username ?? "Unknown", "Accessed Transaction Audit Log");
 
             // 3. Fetch fresh transactions
             using var scope = _services.CreateScope();

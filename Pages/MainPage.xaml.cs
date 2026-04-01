@@ -26,7 +26,7 @@ namespace SecureBankingApp.Pages
                 return;
             }
 
-            var user = _session.CurrentUser;
+            var user = _session.GetCurrentUser(_services);
             if (user == null) return;
 
             // Update UI with Session Data
@@ -64,7 +64,10 @@ namespace SecureBankingApp.Pages
 
             using var scope = _services.CreateScope();
             var freshDb = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            var user = freshDb.Users.SingleOrDefault(u => u.Id == _session.CurrentUser!.Id);
+            var currentUser = _session.GetCurrentUser(_services);
+            if (currentUser == null) return;
+
+            var user = freshDb.Users.SingleOrDefault(u => u.Id == currentUser.Id);
             
             if (user != null)
             {

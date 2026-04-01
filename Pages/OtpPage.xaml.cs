@@ -59,7 +59,7 @@ namespace SecureBankingApp.Pages
             _username = auth.CurrentUsername ?? "";
 
         // Look up the user's email for resend
-        var currentUserId = _session.CurrentUser?.Id;
+        var currentUserId = _session.GetCurrentUser(_services)?.Id;
         var user = currentUserId != null ? db.Users.SingleOrDefault(u => u.Id == currentUserId) : null;
         _userEmail = user?.Email ?? "";
         }

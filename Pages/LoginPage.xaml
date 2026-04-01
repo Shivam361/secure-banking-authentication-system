@@ -69,6 +69,12 @@
                             Clicked="OnLoginClicked"
                             IsEnabled="{Binding IsNotBusy}" />
 
+                    <Button x:Name="BiometricButton" 
+                            Text="Biometric Login" 
+                            Style="{DynamicResource GlassButton}"
+                            Clicked="OnBiometricClicked"
+                            IsVisible="False" />
+
                     <Button Text="Create New Account" 
                             Style="{DynamicResource GlassButton}"
                             Clicked="OnRegisterButtonClicked" />

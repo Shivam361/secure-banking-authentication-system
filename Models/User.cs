@@ -24,6 +24,7 @@ namespace SecureBankingApp.Models
 
         public int FailedLoginCount { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; } // When the account becomes available again
+        public bool BiometricEnabled { get; set; } = false;
     }
 }
 
