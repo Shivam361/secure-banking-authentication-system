@@ -1,0 +1,31 @@
+name: Build and Test Secure Banking App
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET 9
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Install .NET MAUI Workload
+      run: dotnet workload install maui
+
+    - name: Restore dependencies
+      run: dotnet restore SecureBankingApp.sln
+
+    - name: Build MAUI Desktop Target
+      run: dotnet build SecureBankingApp.csproj -f net9.0-windows10.0.19041.0 --no-restore
+      
+    - name: Run Unit Tests
+      run: dotnet test SecureBankingApp.Tests/SecureBankingApp.Tests.csproj --no-build --verbosity normal
