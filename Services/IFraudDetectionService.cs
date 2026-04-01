@@ -16,6 +16,9 @@ namespace SecureBankingApp.Services
         /// <summary>Checks whether two location strings are similar.</summary>
         bool LocationsAreSimilar(string? locA, string? locB);
 
+        /// <summary>Calculates a risk score for a login attempt. Scores >= 50 flag automatic fraud logs.</summary>
+        int CalculateRiskScore(User user, string currentIp, string currentLocation);
+
         /// <summary>Records a fraud event for a location mismatch.</summary>
         void LogFraud(string username, string? loginLocation, string? homeLocation);
     }

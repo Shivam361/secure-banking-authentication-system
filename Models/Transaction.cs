@@ -15,6 +15,7 @@ namespace SecureBankingApp.Models
         public decimal Amount { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string? Location { get; set; }
+        public string? Reference { get; set; }
     }
 
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +12,7 @@ namespace SecureBankingApp.Models
         public string Username { get; set; } = null!;
         public string Code { get; set; } = null!;
         public DateTime ExpiresAt { get; set; }
+        public int ValidationAttempts { get; set; } = 0;
     }
 }
 

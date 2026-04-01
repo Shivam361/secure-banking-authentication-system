@@ -7,22 +7,20 @@ namespace SecureBankingApp.Services
     /// </summary>
     public class SessionService : ISessionService
     {
-        /// <summary>The username of the currently authenticated user, or null if not logged in.</summary>
-        public string? CurrentUsername { get; private set; }
+        public SecureBankingApp.Models.User? CurrentUser { get; private set; }
 
-        /// <summary>True when a user has been authenticated.</summary>
-        public bool IsAuthenticated => !string.IsNullOrEmpty(CurrentUsername);
+        public string? CurrentUsername => CurrentUser?.Username;
 
-        /// <summary>Records a successful login.</summary>
-        public void SetCurrentUser(string username)
+        public bool IsAuthenticated => CurrentUser != null;
+
+        public void Login(SecureBankingApp.Models.User user)
         {
-            CurrentUsername = username;
+            CurrentUser = user;
         }
 
-        /// <summary>Clears the session (logout).</summary>
-        public void Clear()
+        public void Logout()
         {
-            CurrentUsername = null;
+            CurrentUser = null;
         }
     }
 }

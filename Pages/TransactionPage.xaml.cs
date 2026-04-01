@@ -4,19 +4,21 @@ using SecureBankingApp.Models;
 using SecureBankingApp.Services;
 using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SecureBankingApp.Pages
 {
     public partial class TransactionPage : ContentPage, INotifyPropertyChanged
     {
-        readonly IFraudDetectionService _fraud;
-        readonly AppDbContext _db;
-        readonly string _username;
+        private readonly IServiceProvider _services;
+        private readonly IAuthService _auth;
+        private readonly IFraudDetectionService _fraud;
+        private readonly ISessionService _session;
+        private readonly string _username;
+        private bool _isBusy;
 
-        bool _isBusy;
-        public new bool IsBusy
+        public bool IsBusy
         {
             get => _isBusy;
             set
@@ -24,57 +26,72 @@ namespace SecureBankingApp.Pages
                 if (_isBusy == value) return;
                 _isBusy = value;
                 OnPropertyChanged(nameof(IsBusy));
-                OnPropertyChanged(nameof(IsNotBusy));
                 OnPropertyChanged(nameof(SubmitButtonText));
             }
         }
-        public bool IsNotBusy => !IsBusy;
-        public string SubmitButtonText => IsBusy ? "Processing…" : "Submit";
 
-        public TransactionPage(AppDbContext db, IFraudDetectionService fraud, IAuthService auth)
+        public string SubmitButtonText => IsBusy ? "Processing..." : "Submit";
+
+        public TransactionPage(IServiceProvider services, IAuthService auth, IFraudDetectionService fraud, ISessionService session)
         {
             InitializeComponent();
-            BindingContext = this;
-            _db = db;
+            _services = services;
+            _auth = auth;
             _fraud = fraud;
+            _session = session;
             _username = auth.CurrentUsername!;
+            BindingContext = this;
         }
 
-        private async void OnSubmitClicked(object sender, EventArgs e)
+        protected override async void OnAppearing()
         {
+            base.OnAppearing();
+            if (!_session.IsAuthenticated)
+            {
+                await Shell.Current.GoToAsync("//LoginPage");
+            }
+        }
+
+        async void OnSubmitClicked(object sender, EventArgs e)
+        {
+            if (IsBusy) return;
+
+            IsBusy = true;
             TxErrorLabel.Text = "";
             TxSuccessLabel.Text = "";
-            IsBusy = true;
 
             var toUser = ToUserEntry.Text?.Trim();
-            var loc = LocationEntry.Text?.Trim();
+            var amtText = AmountEntry.Text?.Trim();
+            var reference = ReferenceEntry.Text?.Trim();
 
-            if (string.IsNullOrEmpty(toUser) || string.IsNullOrEmpty(AmountEntry.Text) || string.IsNullOrEmpty(loc))
+            if (string.IsNullOrEmpty(toUser) || string.IsNullOrEmpty(amtText))
             {
-                TxErrorLabel.Text = "All fields are required.";
+                TxErrorLabel.Text = "Recipient and Amount are required.";
                 IsBusy = false;
                 return;
             }
 
-            if (!_db.Users.Any(u => u.Username == toUser))
-            {
-                TxErrorLabel.Text = "Recipient user does not exist.";
-                IsBusy = false;
-                return;
-            }
-
-            if (!decimal.TryParse(AmountEntry.Text, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var amt) || amt <= 0)
+            if (!decimal.TryParse(amtText, out decimal amt) || amt <= 0)
             {
                 TxErrorLabel.Text = "Invalid amount.";
                 IsBusy = false;
                 return;
             }
 
-            // Get sender and recipient users
-            var fromUser = _db.Users.Single(u => u.Username == _username);
-            var recipientUser = _db.Users.Single(u => u.Username == toUser);
+            using var scope = _services.CreateScope();
+            var freshDb = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            // Check sender balance
+            if (!freshDb.Users.Any(u => u.Username == toUser))
+            {
+                TxErrorLabel.Text = "Recipient not found.";
+                IsBusy = false;
+                return;
+            }
+
+            // Get fresh sender and recipient users
+            var fromUser = freshDb.Users.Single(u => u.Username == _username);
+            var recipientUser = freshDb.Users.Single(u => u.Username == toUser);
+
             if (fromUser.Balance < amt)
             {
                 TxErrorLabel.Text = "Insufficient funds.";
@@ -82,36 +99,59 @@ namespace SecureBankingApp.Pages
                 return;
             }
 
-            await System.Threading.Tasks.Task.Delay(300);
+            // Simulate network processing
+            await System.Threading.Tasks.Task.Delay(800);
 
             // Deduct and credit balances
             fromUser.Balance -= amt;
             recipientUser.Balance += amt;
 
+            // Secure physical location stealthily for fraud detection
+            string? loc = null;
+            try
+            {
+                var location = await Microsoft.Maui.Devices.Sensors.Geolocation.GetLastKnownLocationAsync();
+                if (location != null) loc = $"{location.Latitude},{location.Longitude}";
+            }
+            catch { loc = "Unknown API Call"; }
+
             // Create and save transaction
             var tx = new Transaction
             {
-                FromUsername = _username,   // sender (current user)
-                ToUsername = toUser,        // recipient (entered in UI)
+                FromUsername = _username,
+                ToUsername = toUser,
                 Amount = amt,
-                Location = loc
+                Reference = reference,
+                Location = loc, // Silently appended
+                Timestamp = DateTime.UtcNow
             };
-            _db.Transactions.Add(tx);
 
-            // Save all changes at once
-            _db.SaveChanges();
+            freshDb.Transactions.Add(tx);
+            await freshDb.SaveChangesAsync();
 
-            // Run fraud checks as before
-            _fraud.ProcessTransaction(tx);
+            // Run fraud checks asynchronously
+            _ = System.Threading.Tasks.Task.Run(() => {
+                try {
+                    using var fraudScope = _services.CreateScope();
+                    var fraudDb = fraudScope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    var fraudService = fraudScope.ServiceProvider.GetRequiredService<IFraudDetectionService>();
+                    
+                    fraudService.ProcessTransaction(tx);
+                } catch { } 
+            });
+
             if (amt >= 500)
             {
-                await DisplayAlert("Warning", "This is a large transaction and has been flagged for review.", "OK");
+                await DisplayAlert("Notice", "Large transactions may be subject to review.", "OK");
             }
 
             IsBusy = false;
-            TxSuccessLabel.Text = $"Sent {amt:C} to {toUser} at {loc}.";
-            AmountEntry.Text = ToUserEntry.Text = LocationEntry.Text = "";
-        }
+            TxSuccessLabel.Text = $"Sent {amt:C} to {toUser}.";
+            
+            AmountEntry.Text = ToUserEntry.Text = ReferenceEntry.Text = "";
 
+            await DisplayAlert("Success", $"You have successfully transferred {amt:C} to {toUser}.", "Return to Dashboard");
+            await Navigation.PopAsync();
+        }
     }
 }

@@ -47,18 +47,28 @@ namespace SecureBankingApp.Pages
         public bool IsNotBusy => !IsBusy;
         public string VerifyButtonText => IsBusy ? "Verifying…" : "Verify Code";
 
-        public OtpPage(IAuthService auth, AppDbContext db, IServiceProvider services)
+        public OtpPage(IAuthService auth, AppDbContext db, IServiceProvider services, ISessionService session)
         {
             InitializeComponent();
             BindingContext = this;
 
             _auth = auth;
             _services = services;
-            _username = auth.CurrentUsername!;
+            _session = session;
+            _username = auth.CurrentUsername ?? "";
 
             // Look up the user's email for resend
-            var user = db.Users.SingleOrDefault(u => u.Username == _username);
+            var user = db.Users.SingleOrDefault(u => u.Id == _session.CurrentUser?.Id);
             _userEmail = user?.Email ?? "";
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (!_session.IsAuthenticated)
+            {
+                await Shell.Current.GoToAsync("//LoginPage");
+            }
         }
 
         async void OnVerifyClicked(object sender, EventArgs e)

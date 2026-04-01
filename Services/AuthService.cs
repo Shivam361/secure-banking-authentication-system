@@ -41,6 +41,7 @@ namespace SecureBankingApp.Services
 
         /// <summary>
         /// Verify login credentials using BCrypt's timing-safe comparison.
+        /// Implements account lockout logic (5 attempts, 15 minute lock).
         /// </summary>
         public bool VerifyPassword(string username, string plain, out User? user)
         {
@@ -48,12 +49,41 @@ namespace SecureBankingApp.Services
             if (user == null)
                 return false;
 
-            // BCrypt.Verify handles salt extraction and timing-safe comparison
+            // 1. Check if account is locked
+            if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.UtcNow)
+            {
+                // Account is still locked
+                return false;
+            }
+
+            // 2. Perform verification
             bool ok = BCrypt.Net.BCrypt.Verify(plain, user.PasswordHash);
 
-            // if valid, record in session
             if (ok)
-                _session.SetCurrentUser(username);
+            {
+                // Success: Reset failures and lockout
+                user.FailedLoginCount = 0;
+                user.LockoutEnd = null;
+                _db.Users.Update(user);
+                _db.SaveChanges();
+
+                // Record in session
+                _session.Login(user);
+            }
+            else
+            {
+                // Failure: Increment count
+                user.FailedLoginCount++;
+                
+                if (user.FailedLoginCount >= 5)
+                {
+                    // Lock for 15 minutes
+                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                }
+
+                _db.Users.Update(user);
+                _db.SaveChanges();
+            }
 
             return ok;
         }
@@ -91,22 +121,37 @@ namespace SecureBankingApp.Services
         }
 
         // Validate OTP and consume it
+        // Implements rate limiting (5 validation attempts)
         public bool ValidateOtp(string username, string code)
         {
             var now = DateTime.UtcNow;
-            var req = _db.OTPRequests
-                .Where(r => r.Username == username && r.Code == code && r.ExpiresAt >= now)
-                .OrderByDescending(r => r.ExpiresAt)
-                .FirstOrDefault();
-
-            // Cleanup expired OTPs
-            var expired = _db.OTPRequests.Where(r => r.ExpiresAt < now);
-            _db.OTPRequests.RemoveRange(expired);
-            _db.SaveChanges();
+            var req = _db.OTPRequests.SingleOrDefault(r => r.Username == username && r.ExpiresAt >= now);
 
             if (req == null) return false;
 
+            if (req.ValidationAttempts >= 5)
+            {
+                // Brute force detected — consume and fail
+                _db.OTPRequests.Remove(req);
+                _db.SaveChanges();
+                return false;
+            }
+
+            if (req.Code != code)
+            {
+                req.ValidationAttempts++;
+                _db.OTPRequests.Update(req);
+                _db.SaveChanges();
+                return false;
+            }
+
+            // Success: consume and allow
             _db.OTPRequests.Remove(req);
+            
+            // Cleanup other expired OTPs while we are here
+            var expired = _db.OTPRequests.Where(r => r.ExpiresAt < now);
+            _db.OTPRequests.RemoveRange(expired);
+            
             _db.SaveChanges();
             return true;
         }

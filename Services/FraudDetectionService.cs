@@ -96,13 +96,43 @@ namespace SecureBankingApp.Services
             return a.Contains(b) || b.Contains(a);
         }
         public void LogFraud(string username, string? loginLocation, string? homeLocation)
-
         {
             _db.FraudLogs.Add(new FraudLog
             {
                 Description = $"Login from unusual location '{loginLocation}' for user '{username}' (Home: {homeLocation})"
             });
             _db.SaveChanges();
+        }
+
+        public int CalculateRiskScore(User user, string currentIp, string currentLocation)
+        {
+            int score = 0;
+
+            // 1. Location Mismatch (+50)
+            if (!string.IsNullOrEmpty(user.HomeLocation) && 
+                !LocationsAreSimilar(currentLocation, user.HomeLocation))
+            {
+                score += 50;
+            }
+
+            // 2. Multiple failed attempts (+30)
+            // Define "multiple" as 3 or more total failed attempts in history
+            if (user.FailedLoginCount >= 3)
+            {
+                score += 30;
+            }
+
+            // 3. Automatic logging if threshold met
+            if (score >= 50)
+            {
+                _db.FraudLogs.Add(new FraudLog
+                {
+                    Description = $"High Risk Login Detected (Score: {score}) for {user.Username}. Location: {currentLocation}, IP: {currentIp}"
+                });
+                _db.SaveChanges();
+            }
+
+            return score;
         }
     }
 }

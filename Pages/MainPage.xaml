@@ -11,25 +11,37 @@
         <VerticalStackLayout Padding="24" Spacing="24">
 
             <!-- Header Section -->
-            <Grid ColumnDefinitions="*, Auto">
+            <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="10">
                 <VerticalStackLayout Grid.Column="0" Spacing="4">
                     <Label Text="Welcome back," 
                            TextColor="{StaticResource Gray400}" 
                            FontSize="14" />
-                    <Label Text="Secure Account" 
+                    <Label x:Name="UserDisplayNameLabel" 
                            FontSize="24" 
                            FontAttributes="Bold" />
                 </VerticalStackLayout>
+
+                <Button Grid.Column="1"
+                        Text="Logout"
+                        Style="{StaticResource BaseButton}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource StatusError}"
+                        BorderColor="{StaticResource StatusError}"
+                        BorderWidth="1"
+                        FontSize="12"
+                        Padding="10,0"
+                        HeightRequest="30"
+                        Clicked="OnLogoutClicked" />
                 
                 <!-- Notification / User Icon placeholder -->
-                <Frame Grid.Column="1" 
+                <Frame Grid.Column="2" 
                        WidthRequest="50" 
                        HeightRequest="50" 
                        CornerRadius="25" 
                        Padding="0" 
                        BackgroundColor="{StaticResource Gray800}" 
                        BorderColor="{StaticResource GlassBorder}">
-                    <Label Text="JS" 
+                    <Label x:Name="UserInitialsLabel" 
                            HorizontalOptions="Center" 
                            VerticalOptions="Center" 
                            TextColor="{StaticResource AccentGold}" 
@@ -76,17 +88,23 @@
                   RowSpacing="16">
                 
                 <Button Grid.Row="0" Grid.Column="0"
-                        Text="New Transfer" 
+                        Text="Send Money" 
                         Style="{StaticResource AccentButton}"
                         Clicked="OnNewTransactionClicked" />
 
                 <Button Grid.Row="0" Grid.Column="1"
-                        Text="History" 
+                        Text="Top-Up +$500" 
+                        Style="{StaticResource BaseButton}"
+                        BackgroundColor="{StaticResource Secondary}"
+                        Clicked="OnTopUpClicked" />
+
+                <Button Grid.Row="1" Grid.ColumnSpan="2"
+                        Text="View Transaction History" 
                         Style="{StaticResource GlassButton}"
                         Clicked="OnViewTransactionsClicked" />
 
                 <!-- Security alerts - integrated badge -->
-                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                <Grid Grid.Row="2" Grid.ColumnSpan="2">
                     <Button x:Name="FraudLogButton" 
                             Text="Security Alerts" 
                             Style="{StaticResource GlassButton}"

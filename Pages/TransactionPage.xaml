@@ -29,8 +29,8 @@
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="ORIGIN LOCATION" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
-                        <Entry x:Name="LocationEntry" Placeholder="Current City" Keyboard="Text" />
+                        <Label Text="REFERENCE (OPTIONAL)" TextColor="{StaticResource Gray400}" FontSize="10" CharacterSpacing="1" Margin="4,0"/>
+                        <Entry x:Name="ReferenceEntry" Placeholder="e.g. Dinner refund" Keyboard="Text" />
                     </VerticalStackLayout>
 
                     <Button x:Name="SubmitButton"

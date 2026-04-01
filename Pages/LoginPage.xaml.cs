@@ -51,69 +51,52 @@ namespace SecureBankingApp.Pages
 
         private async void OnLoginClicked(object sender, EventArgs e)
         {
+            if (IsBusy) return;
             IsBusy = true;
             ErrorLabel.Text = "";
 
             var username = UsernameEntry.Text?.Trim() ?? "";
             var password = PasswordEntry.Text ?? "";
 
-            // Get user (before password check, to check lockout)
-            var user = _auth.GetUser(username); // <-- you may need to add this method, see below
-            if (user != null && user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.UtcNow)
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                ErrorLabel.Text = $"Account locked until {user.LockoutEnd.Value:t}.";
+                ErrorLabel.Text = "Please enter both credentials.";
                 IsBusy = false;
                 return;
             }
 
-            // Verify credentials
-            var ok = _auth.VerifyPassword(username, password, out user);
+            // 1. Verify Credentials (AuthService handles Session and DB state internally now)
+            var ok = _auth.VerifyPassword(username, password, out var user);
 
-            // Log login attempt with dummy IP for now (still useful for stats)
-            _fraud.LogAttempt(username, ok, "127.0.0.1");
+            // Fetch IP and Location for fraud/risk analysis
+            string currentIp = "127.0.0.1"; // Default fallback
+            string currentLoc = await NetworkHelper.GetCurrentLocationAsync();
 
-            if (!ok || user is null)
+            if (user != null)
             {
-                // Brute-force logic
-                if (user != null)
+                // 2. Perform Risk Analysis
+                _fraud.CalculateRiskScore(user, currentIp, currentLoc);
+
+                // 3. Handle Lockout Response
+                if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.UtcNow)
                 {
-                    user.FailedLoginCount += 1;
-                    if (user.FailedLoginCount >= 5)
-                    {
-                        user.LockoutEnd = DateTime.UtcNow.AddMinutes(5); // lock for 5 min
-                        _fraud.LogFraud(user.Username, "Brute-force detected", "N/A");
-                    }
-                    _auth.SaveUser(user); // <-- ensure this persists to DB
+                    ErrorLabel.Text = $"Account locked. Try again after {user.LockoutEnd.Value:t}.";
+                    IsBusy = false;
+                    return;
                 }
+            }
 
-                ErrorLabel.Text = "Invalid credentials.";
+            // Log raw attempt for auditing
+            _fraud.LogAttempt(username, ok, currentIp);
+
+            if (!ok || user == null)
+            {
+                ErrorLabel.Text = "Invalid username or password.";
                 IsBusy = false;
                 return;
             }
-            else
-            {
-                // Reset failed count on successful login
-                user.FailedLoginCount = 0;
-                user.LockoutEnd = null;
-                _auth.SaveUser(user); // <-- ensure this persists to DB
-            }
 
-            // --- Check login location against home location ---
-            string loginLocation = await NetworkHelper.GetCurrentLocationAsync();
-
-            var normalizedHome = (user.HomeLocation ?? "").Trim().ToLowerInvariant();
-            var normalizedLogin = (loginLocation ?? "").Trim().ToLowerInvariant();
-
-            // Only log fraud if the locations are not similar
-            if (!string.IsNullOrEmpty(normalizedHome) && !string.IsNullOrEmpty(normalizedLogin) &&
-                !_fraud.LocationsAreSimilar(loginLocation, user.HomeLocation))
-            {
-                _fraud.LogFraud(user.Username, loginLocation ?? "Unknown", user.HomeLocation);
-            }
-
-            // --- End location check ---
-
-            // Generate OTP and send via email
+            // 4. Generate OTP and send via email
             var (emailSent, otpCode) = await _auth.GenerateAndSendOtpAsync(username, user.Email);
 
             await Task.Delay(250);
